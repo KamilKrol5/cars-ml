@@ -4,7 +4,8 @@ from model.Car import Car
 from model.NeuralNetwork import NeuralNetwork
 from model.Sensor import Sensor
 
-if __name__ == '__main__':
+
+def main():
     neural_network = NeuralNetwork()
     sensor = Sensor()
     car = Car(neural_network, sensor, (0, 0, 45))
@@ -12,3 +13,7 @@ if __name__ == '__main__':
         sleep(1)
         car.tick()
         car.go_brrrr()
+
+
+if __name__ == "__main__":
+    main()

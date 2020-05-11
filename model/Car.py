@@ -15,8 +15,12 @@ class Car:
     __ROTATION_RATE: float = 1
     __SIZE: float = 10
 
-    def __init__(self, neural_network: NeuralNetwork, sensor: Sensor,
-                 position: Tuple[float, float, float]):
+    def __init__(
+        self,
+        neural_network: NeuralNetwork,
+        sensor: Sensor,
+        position: Tuple[float, float, float],
+    ):
         self.__position_x: float = position[0]
         self.__position_y: float = position[1]
         self.__velocity: float = 0
@@ -54,7 +58,11 @@ class Car:
                 self.__velocity = -Car.__MAX_BACKWARD_VELOCITY
 
     def __rotate(self, rotation: float) -> None:
-        if 0.05 * -Car.__MAX_BACKWARD_VELOCITY < self.__velocity < 0.05 * Car.__MAX_FORWARD_VELOCITY:
+        if (
+            0.05 * -Car.__MAX_BACKWARD_VELOCITY
+            < self.__velocity
+            < 0.05 * Car.__MAX_FORWARD_VELOCITY
+        ):
             return  # vehicle is not able to rotate when goes very slow to avoid rotation "like tank"
         if rotation > 0:
             self.__turn += Car.__ROTATION_RATE
