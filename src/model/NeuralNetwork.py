@@ -5,7 +5,7 @@ import numpy as np
 
 
 class NeuralNetwork:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def compute(self, data: np.ndarray) -> Tuple[int, int]:

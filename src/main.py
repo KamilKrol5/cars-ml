@@ -5,7 +5,7 @@ from model.NeuralNetwork import NeuralNetwork
 from model.Sensor import Sensor
 
 
-def main():
+def main() -> None:
     neural_network = NeuralNetwork()
     sensor = Sensor()
     car = Car(neural_network, sensor, (0, 0, 45))
