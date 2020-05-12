@@ -1,8 +1,8 @@
 from time import sleep
 
-from model.Car import Car
-from model.NeuralNetwork import NeuralNetwork
-from model.Sensor import Sensor
+from model.car import Car
+from model.neural_network import NeuralNetwork
+from model.sensor import Sensor
 
 
 def main() -> None:

@@ -2,7 +2,7 @@ from typing import Optional
 
 import numpy as np
 
-from model.Car import Car
+from model.car import Car
 
 
 class Sensor:

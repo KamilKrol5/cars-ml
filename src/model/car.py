@@ -3,8 +3,8 @@ from typing import Tuple
 
 import numpy as np
 
-from model.NeuralNetwork import NeuralNetwork
-from model.Sensor import Sensor
+from model.neural_network import NeuralNetwork
+from model.sensor import Sensor
 
 
 class Car:
