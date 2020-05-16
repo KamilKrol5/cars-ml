@@ -28,7 +28,6 @@ class Car:
 
         self.__neural_network: NeuralNetwork = neural_network
         self.__sensor: Sensor = sensor
-        self.__sensor.bind(self)
         self.__crashed: bool = False
 
     @property
@@ -46,6 +45,10 @@ class Car:
     @property
     def turn(self) -> float:
         return self.__turn
+
+    @property
+    def crashed(self) -> bool:
+        return self.__crashed
 
     def __accelerate(self, acceleration: float) -> None:
         if acceleration > 0:
@@ -73,17 +76,23 @@ class Car:
         self.__position_x += sin(self.__turn / 180 * pi) * self.__velocity
         self.__position_y += cos(self.__turn / 180 * pi) * self.__velocity
 
-    def __check_collision(self) -> bool:
-        #  set self.__crashed using self.__sensor
-        return self.__crashed
+    def __check_collision_and_set_crashed(self) -> None:
+        #  set self.__crashed using self.__sensor or basing on last detection
+        self.__crashed = False
 
-    def tick(self) -> bool:
-        detection: np.ndarray = self.__sensor.detect()
+    def tick(self) -> None:
+        if self.__crashed:
+            return
+        detection: np.ndarray = self.__sensor.detect(
+            self.__position_x, self.__position_y, self.__turn
+        )
         acceleration, rotation = self.__neural_network.compute(detection)
         self.__accelerate(acceleration)
         self.__rotate(rotation)
         self.__go()
-        return self.__check_collision()
+        self.__check_collision_and_set_crashed()
+        if self.__crashed:
+            self.__velocity = 0
 
     def go_brrrr(self) -> None:
         print("brrr!")
