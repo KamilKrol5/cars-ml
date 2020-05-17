@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-
 from model.neural_network.activation_functions import (
     sigmoid_star,
     relu,
