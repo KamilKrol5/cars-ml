@@ -4,7 +4,7 @@ from typing import Tuple
 import numpy as np
 
 from model.neural_network_old import NeuralNetwork
-from model.sensor import Sensor
+from model.geom.sensor import Sensor
 
 
 class Car:
