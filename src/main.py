@@ -1,5 +1,7 @@
 from time import sleep
 
+from planar.line import Ray
+
 from model.car import Car
 from model.neural_network_old import NeuralNetwork
 from model.sensor import Sensor
@@ -7,7 +9,7 @@ from model.sensor import Sensor
 
 def main() -> None:
     neural_network = NeuralNetwork()
-    sensor = Sensor()
+    sensor = Sensor(Ray((0, 0), (0, 1)))  # TODO: move construction elsewhere
     car = Car(neural_network, sensor, (0, 0, 45))
     while True:
         sleep(1)
