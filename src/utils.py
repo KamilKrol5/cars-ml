@@ -10,3 +10,19 @@ def pairwise(iterable: Iterable[T]) -> Iterable[Tuple[T, T]]:
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
+
+
+def spread_int(a: int, min_bound: int, max_bound: int) -> Iterable[int]:
+    """a, min, max -> a, a + 1, a - 1, a + 2, a - 2, ..., min/(max - 1)"""
+    yield a
+    diff = 1
+    done = False
+    while not done:
+        done = True
+        if (x := a + diff) < max_bound:
+            yield x
+            done = False
+        if (x := a - diff) >= min_bound:
+            yield x
+            done = False
+        diff += 1
