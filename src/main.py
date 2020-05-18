@@ -4,7 +4,7 @@ from planar.line import Ray
 
 from model.car import Car
 from model.neural_network_old import NeuralNetwork
-from model.sensor import Sensor
+from model.geom.sensor import Sensor
 
 
 def main() -> None:
