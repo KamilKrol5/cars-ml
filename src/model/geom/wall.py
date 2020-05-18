@@ -9,12 +9,12 @@ from utils import pairwise
 
 @dataclass
 class Wall:
-    segment: LineSegment
+    line_segment: LineSegment
 
     def intersects(self, shape: Polygon) -> bool:
         """Check whether this wall intersects a Polygon."""
-        segment_line = self.segment.line
-        vertex1, vertex2 = self.segment.points
+        segment_line = self.line_segment.line
+        vertex1, vertex2 = self.line_segment.points
         relative_sides = ((p, segment_line.point_left(p)) for p in shape)
         for (p1, s1), (p2, s2) in islice(pairwise(cycle(relative_sides)), len(shape)):
             if s1 is not s2:
