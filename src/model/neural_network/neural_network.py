@@ -32,26 +32,25 @@ class NeuralNetworkHiddenLayer:
 
 
 class NeuralNetwork:
-    """
-    Class representing a neural network (multilayer perceptron).
-
-    Args:
-        hidden_layers_info (List[NeuralNetworkHiddenLayerInfo): A list of objects
-            with info needed for creation of hidden layers. There must be at least two layers,
-            since single layer network is not supported. The first layer's neurons count
-            must be consistent with training data if provided.
-        training_data_sets (numpy.ndarray): Data which will be used for training. If not provided,
-            there is up to user to set up weights and biases to make any predictions 'sensible'
-        labels (numpy.ndarray): same as for training_data_sets. It's dimensions must be consistent with
-            training data sets and first layer's neuron count.
-    """
-
     def __init__(
             self,
             hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
             training_data_sets: Optional[np.ndarray],
             labels: Optional[np.ndarray],
     ):
+        """
+            Class representing a neural network (multilayer perceptron).
+
+            Args:
+                hidden_layers_info (List[NeuralNetworkHiddenLayerInfo): A list of objects
+                    with info needed for creation of hidden layers. There must be at least two layers,
+                    since single layer network is not supported. The first layer's neurons count
+                    must be consistent with training data if provided.
+                training_data_sets (numpy.ndarray): Data which will be used for training. If not provided,
+                    there is up to user to set up weights and biases to make any predictions 'sensible'
+                labels (numpy.ndarray): same as for training_data_sets. It's dimensions must be consistent with
+                    training data sets and first layer's neuron count.
+        """
         if len(hidden_layers_info) < 2:
             raise NotImplementedError(
                 "This implementation of neural network does not support single layer networks"
