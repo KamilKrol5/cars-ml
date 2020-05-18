@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import cast
 
 from planar import Polygon, Vec2
+from planar.line import LineSegment
 
 from model.geom.wall import Wall
 
@@ -24,6 +25,22 @@ class TrackSegment:
                 *self.left_wall.line_segment.points,
                 *reversed(self.right_wall.line_segment.points),
             ]
+        )
+
+    @cached_property
+    def back_wall(self) -> Wall:
+        return Wall(
+            LineSegment.from_points(
+                [self.left_wall.line_segment.start, self.right_wall.line_segment.start]
+            )
+        )
+
+    @cached_property
+    def front_wall(self) -> Wall:
+        return Wall(
+            LineSegment.from_points(
+                [self.left_wall.line_segment.end, self.right_wall.line_segment.end]
+            )
         )
 
     def is_point_inside(self, center: Vec2) -> bool:
