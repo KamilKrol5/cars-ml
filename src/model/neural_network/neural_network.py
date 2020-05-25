@@ -32,14 +32,15 @@ class NeuralNetworkHiddenLayer:
 
 
 class NeuralNetwork:
+    """
+    Class representing a neural network (multilayer perceptron).
+    """
     def __init__(
             self,
             hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
             output_neurons_count
     ):
         """
-        Class representing a neural network (multilayer perceptron).
-
         Args:
             hidden_layers_info (List[NeuralNetworkHiddenLayerInfo): A list of objects
                 with info needed for creation of hidden layers. There must be at least two layers,
