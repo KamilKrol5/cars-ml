@@ -14,7 +14,7 @@ ActivationFunctionUtils = namedtuple(
 )
 
 activation_functions_utils = {
-    "sigmoid": ActivationFunctionUtils(function=sigmoid, derivative=sigmoid_derivative_from_value()),
+    "sigmoid": ActivationFunctionUtils(function=sigmoid, derivative=sigmoid_derivative_from_value),
     "relu": ActivationFunctionUtils(function=relu, derivative=relu_derivative_from_value),
     "tanh": ActivationFunctionUtils(function=tanh, derivative=tanh_derivative_from_value),
 }
