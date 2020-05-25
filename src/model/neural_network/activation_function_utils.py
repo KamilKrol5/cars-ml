@@ -10,7 +10,7 @@ from model.neural_network.activation_functions import (
 )
 
 ActivationFunctionUtils = namedtuple(
-    "_ActivationFunctionUtils", ["function", "derivative"]
+    "ActivationFunctionUtils", ["function", "derivative"]
 )
 
 activation_functions_utils = {

@@ -11,7 +11,7 @@ def sigmoid(x: np.ndarray) -> np.ndarray:
     return 1 / (1 + np.exp(-x))
 
 
-def sigmoid_star(x: np.ndarray) -> np.ndarray:
+def sigmoid_derivative_simplified(x: np.ndarray) -> np.ndarray:
     return x * (1.0 - x)
 
 
