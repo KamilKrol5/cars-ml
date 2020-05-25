@@ -4,7 +4,7 @@ tanh = np.tanh
 
 
 def tanh_derivative_from_value(x: np.ndarray) -> np.ndarray:
-    return 1.0 - np.tanh(x) ** 2
+    return 1.0 - x ** 2
 
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
