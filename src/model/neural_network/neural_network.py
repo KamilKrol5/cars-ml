@@ -51,12 +51,12 @@ class NeuralNetwork:
                 "This implementation of neural network does not support single layer networks"
             )
         self.output_neurons_count = output_neurons_count
+        self.output = np.zeros((output_neurons_count, 1))
 
         self.hidden_layers_info = hidden_layers_info
         self.input_layer_neuron_count = self.hidden_layers_info[0].neurons_count
         self.hidden_layers = self._create_hidden_layers()
 
-        self.output = np.zeros((output_neurons_count, 1))
         self.eta = 0.5
 
     def _feed_forward(
