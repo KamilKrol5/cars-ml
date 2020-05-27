@@ -76,8 +76,9 @@ class NeuralNetwork:
 
         values = training_data_set
         for layer in self.hidden_layers:
+            print(f'values shape = {values.shape}; layer weights shape (transposed) = {layer.weights.T.shape}; layer biases = {layer.biases.shape}')
             values = layer.activation.value(
-                np.dot(values, layer.weights.T) + layer.biases
+                np.dot(values, layer.weights.T) + layer.biases.reshape(1, -1)
             )
 
         return values
@@ -98,14 +99,14 @@ class NeuralNetwork:
             weights = np.random.rand(
                 next_layer_info.neurons_count, layer_info.neurons_count,
             )
-            biases = np.random.rand(layer_info.neurons_count)
+            biases = np.random.rand(next_layer_info.neurons_count)
             hidden_layers.append(NeuralNetworkHiddenLayer(layer_info, weights, biases))
 
         last_hidden_layer_info = hidden_layers_info[-1]
         last_hidden_layer_info_weights = np.random.rand(
             output_neurons_count, last_hidden_layer_info.neurons_count
         )
-        last_hidden_layer_biases = np.random.rand(last_hidden_layer_info.neurons_count)
+        last_hidden_layer_biases = np.random.rand(output_neurons_count)
         hidden_layers.append(
             NeuralNetworkHiddenLayer(
                 last_hidden_layer_info,
