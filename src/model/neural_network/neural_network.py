@@ -74,7 +74,6 @@ class NeuralNetwork:
 
         values = training_data_set
         for layer in self.hidden_layers:
-            print(f'values shape = {values.shape}; layer weights shape (transposed) = {layer.weights.T.shape}; layer biases = {layer.biases.shape}')
             values = layer.activation.value(
                 np.dot(values, layer.weights.T) + layer.biases.reshape(1, -1)
             )
