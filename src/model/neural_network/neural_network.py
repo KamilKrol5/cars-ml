@@ -67,9 +67,7 @@ class NeuralNetwork:
                 The dimension of this array should be (number of data samples, single data sample length).
                 Single data sample length must be equal to input_layer_neuron_count of the neural network.
                 Example: Let's assume that [[a], [b], [c]] is training_data_set given as argument.
-                Its shape is (3, 1), so there are 3 data samples, and each of the samples is one dimensional.
-                Then neural network has 1 neuron in the input layer.
-
+                Its shape is (3, 1), so there are 3 data samples, and each of the samples has length 1.
         """
         if training_data_set.shape[1] != self.input_layer_neuron_count:
             raise ValueError("Dimension mismatch")
