@@ -10,10 +10,10 @@ from model.neural_network.activation_function_utils import (
 np.set_printoptions(suppress=True)
 
 
+@dataclass
 class NeuralNetworkHiddenLayerInfo:
-    def __init__(self, activation_function_name: str, neurons_count: int):
-        self.activation_function_name: str = activation_function_name
-        self.neurons_count: int = neurons_count
+    self.activation_function_name: str
+    self.neurons_count: int
 
 
 class NeuralNetworkHiddenLayer:
