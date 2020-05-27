@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import List
 
 import numpy as np
@@ -12,8 +13,8 @@ np.set_printoptions(suppress=True)
 
 @dataclass
 class NeuralNetworkHiddenLayerInfo:
-    self.activation_function_name: str
-    self.neurons_count: int
+    activation_function_name: str
+    neurons_count: int
 
 
 class NeuralNetworkHiddenLayer:
@@ -31,6 +32,7 @@ class NeuralNetwork:
     """
     Class representing a neural network (multilayer perceptron).
     """
+
     def __init__(
             self,
             hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
@@ -47,18 +49,17 @@ class NeuralNetwork:
                 "This implementation of neural network does not support single layer networks"
             )
         self.output_neurons_count = output_neurons_count
-        self.output = np.zeros((output_neurons_count, 1))
 
         self.hidden_layers_info = hidden_layers_info
         self.input_layer_neuron_count = self.hidden_layers_info[0].neurons_count
-        self.hidden_layers = self._create_hidden_layers()
+        self.hidden_layers = self._create_hidden_layers(hidden_layers_info)
 
         self.eta = 0.5
 
     def _feed_forward(
             self,
             training_data_sets: np.ndarray,
-    ) -> None:
+    ) -> np.ndarray:
         """
         Feeds the neural network with the data provided.
 
@@ -72,14 +73,19 @@ class NeuralNetwork:
                 np.dot(layer.values, layer.weights.T) + layer.biases
             )
         last_hidden_layer = self.hidden_layers[-1]
-        self.output = last_hidden_layer.utils.function(
+        return last_hidden_layer.utils.function(
             np.dot(last_hidden_layer.values, last_hidden_layer.weights.T) + last_hidden_layer.biases
         )
 
-    def _create_hidden_layers(self) -> List[NeuralNetworkHiddenLayer]:
+    def predict(self, input_data_set: np.ndarray) -> np.ndarray:
+        output = self._feed_forward(input_data_set)
+        return output
+
+    @staticmethod
+    def _create_hidden_layers(hidden_layers_info: List[NeuralNetworkHiddenLayerInfo]) -> List[NeuralNetworkHiddenLayer]:
         hidden_layers = []
         for layer_info, next_layer_info in zip(
-                self.hidden_layers_info[0:-1], self.hidden_layers_info[1:]
+                hidden_layers_info[0:-1], hidden_layers_info[1:]
         ):
             weights = np.random.rand(
                 next_layer_info.neurons_count, layer_info.neurons_count,
@@ -87,9 +93,9 @@ class NeuralNetwork:
             biases = np.random.rand(layer_info.neurons_count)
             hidden_layers.append(NeuralNetworkHiddenLayer(layer_info, weights, biases))
 
-        last_hidden_layer_info = self.hidden_layers_info[-1]
+        last_hidden_layer_info = hidden_layers_info[-1]
         last_hidden_layer_info_weights = np.random.rand(
-            self.output.shape[1], last_hidden_layer_info.neurons_count
+            1, last_hidden_layer_info.neurons_count
         )
         last_hidden_layer_biases = np.random.rand(last_hidden_layer_info.neurons_count)
         hidden_layers.append(
@@ -98,7 +104,3 @@ class NeuralNetwork:
             )
         )
         return hidden_layers
-
-    def predict(self, input_data_set: np.ndarray) -> np.ndarray:
-        self._feed_forward(input_data_set)
-        return self.output
