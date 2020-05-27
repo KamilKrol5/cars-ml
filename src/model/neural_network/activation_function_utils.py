@@ -1,5 +1,6 @@
 from collections import Callable
 from dataclasses import dataclass
+
 import numpy as np
 
 from model.neural_network.activation_functions import (
@@ -19,7 +20,13 @@ class ActivationFunction:
 
 
 activation_functions_utils = {
-    "sigmoid": ActivationFunction(function=sigmoid, derivative_from_value=sigmoid_derivative_from_value),
-    "relu": ActivationFunction(function=relu, derivative_from_value=relu_derivative_from_value),
-    "tanh": ActivationFunction(function=tanh, derivative_from_value=tanh_derivative_from_value),
+    "sigmoid": ActivationFunction(
+        function=sigmoid, derivative_from_value=sigmoid_derivative_from_value
+    ),
+    "relu": ActivationFunction(
+        function=relu, derivative_from_value=relu_derivative_from_value
+    ),
+    "tanh": ActivationFunction(
+        function=tanh, derivative_from_value=tanh_derivative_from_value
+    ),
 }
