@@ -19,10 +19,10 @@ class NeuralNetworkHiddenLayerInfo:
 
 class NeuralNetworkHiddenLayer:
     def __init__(
-        self,
-        basic_info: NeuralNetworkHiddenLayerInfo,
-        weights: np.ndarray,
-        biases: np.ndarray,
+            self,
+            basic_info: NeuralNetworkHiddenLayerInfo,
+            weights: np.ndarray,
+            biases: np.ndarray,
     ):
         self.info = basic_info
         self.utils: ActivationFunction = activation_functions_utils[
@@ -39,9 +39,9 @@ class NeuralNetwork:
     """
 
     def __init__(
-        self,
-        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
-        output_neurons_count: int,
+            self,
+            hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
+            output_neurons_count: int,
     ):
         """
         Args:
@@ -57,7 +57,7 @@ class NeuralNetwork:
 
         self.hidden_layers_info = hidden_layers_info
         self.input_layer_neuron_count = self.hidden_layers_info[0].neurons_count
-        self.hidden_layers = self._create_hidden_layers(hidden_layers_info)
+        self.hidden_layers = self._create_hidden_layers(hidden_layers_info, output_neurons_count)
 
         self.eta = 0.5
 
@@ -93,11 +93,12 @@ class NeuralNetwork:
 
     @staticmethod
     def _create_hidden_layers(
-        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
+            hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
+            output_neurons_count: int
     ) -> List[NeuralNetworkHiddenLayer]:
         hidden_layers = []
         for layer_info, next_layer_info in zip(
-            hidden_layers_info[:-1], hidden_layers_info[1:]
+                hidden_layers_info[:-1], hidden_layers_info[1:]
         ):
             weights = np.random.rand(
                 next_layer_info.neurons_count, layer_info.neurons_count,
@@ -107,7 +108,7 @@ class NeuralNetwork:
 
         last_hidden_layer_info = hidden_layers_info[-1]
         last_hidden_layer_info_weights = np.random.rand(
-            1, last_hidden_layer_info.neurons_count
+            output_neurons_count, last_hidden_layer_info.neurons_count
         )
         last_hidden_layer_biases = np.random.rand(last_hidden_layer_info.neurons_count)
         hidden_layers.append(
