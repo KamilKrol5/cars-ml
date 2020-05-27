@@ -68,7 +68,7 @@ class NeuralNetwork:
         """
         input_layer = self.hidden_layers[0]
         input_layer.values = training_data_sets
-        for layer, next_layer in zip(self.hidden_layers[0:-1], self.hidden_layers[1:]):
+        for layer, next_layer in zip(self.hidden_layers[:-1], self.hidden_layers[1:]):
             next_layer.values = layer.utils.function(
                 np.dot(layer.values, layer.weights.T) + layer.biases
             )
