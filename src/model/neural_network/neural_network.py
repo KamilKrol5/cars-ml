@@ -19,10 +19,10 @@ class NeuralNetworkHiddenLayerInfo:
 
 class NeuralNetworkHiddenLayer:
     def __init__(
-            self,
-            basic_info: NeuralNetworkHiddenLayerInfo,
-            weights: np.ndarray,
-            biases: np.ndarray,
+        self,
+        basic_info: NeuralNetworkHiddenLayerInfo,
+        weights: np.ndarray,
+        biases: np.ndarray,
     ):
         self.info = basic_info
         self.utils: ActivationFunction = activation_functions_utils[
@@ -30,7 +30,6 @@ class NeuralNetworkHiddenLayer:
         ]
         self.weights: np.ndarray = weights
         self.biases = biases
-        # self.values: np.ndarray = np.zeros(shape=(self.info.neurons_count,))
 
 
 class NeuralNetwork:
@@ -39,9 +38,9 @@ class NeuralNetwork:
     """
 
     def __init__(
-            self,
-            hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
-            output_neurons_count: int,
+        self,
+        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
+        output_neurons_count: int,
     ):
         """
         Args:
@@ -57,11 +56,11 @@ class NeuralNetwork:
 
         self.hidden_layers_info = hidden_layers_info
         self.input_layer_neuron_count = self.hidden_layers_info[0].neurons_count
-        self.hidden_layers = self._create_hidden_layers(hidden_layers_info, output_neurons_count)
+        self.hidden_layers = self._create_hidden_layers(
+            hidden_layers_info, output_neurons_count
+        )
 
-        self.eta = 0.5
-
-    def _feed_forward(self, training_data_set: np.ndarray, ) -> np.ndarray:
+    def _feed_forward(self, training_data_set: np.ndarray,) -> np.ndarray:
         """
         Feeds the neural network with the data provided.
 
@@ -75,7 +74,7 @@ class NeuralNetwork:
 
         """
         if training_data_set.shape[1] != self.input_layer_neuron_count:
-            raise ValueError('Dimension mismatch')
+            raise ValueError("Dimension mismatch")
 
         values = training_data_set
         for layer, next_layer in zip(self.hidden_layers[:-1], self.hidden_layers[1:]):
@@ -93,12 +92,12 @@ class NeuralNetwork:
 
     @staticmethod
     def _create_hidden_layers(
-            hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
-            output_neurons_count: int
+        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
+        output_neurons_count: int,
     ) -> List[NeuralNetworkHiddenLayer]:
         hidden_layers = []
         for layer_info, next_layer_info in zip(
-                hidden_layers_info[:-1], hidden_layers_info[1:]
+            hidden_layers_info[:-1], hidden_layers_info[1:]
         ):
             weights = np.random.rand(
                 next_layer_info.neurons_count, layer_info.neurons_count,
