@@ -9,9 +9,10 @@ from model.neural_network.activation_functions import (
     tanh,
 )
 
-ActivationFunctionUtils = namedtuple(
-    "ActivationFunctionUtils", ["function", "derivative"]
-)
+@dataclass
+class ActivationFunction:
+    function: Callable[[np.ndarray], np.ndarray]
+    derivative_from_value: Callable[[np.ndarray], np.ndarray]
 
 activation_functions_utils = {
     "sigmoid": ActivationFunctionUtils(function=sigmoid, derivative=sigmoid_derivative_from_value),
