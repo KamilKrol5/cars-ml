@@ -5,7 +5,7 @@ import numpy as np
 
 from model.neural_network.activation_function_utils import (
     activation_functions_utils,
-    ActivationFunctionUtils,
+    ActivationFunction,
 )
 
 np.set_printoptions(suppress=True)
@@ -20,7 +20,7 @@ class NeuralNetworkHiddenLayerInfo:
 class NeuralNetworkHiddenLayer:
     def __init__(self, basic_info: NeuralNetworkHiddenLayerInfo, weights: np.ndarray, biases: np.ndarray):
         self.info = basic_info
-        self.utils: ActivationFunctionUtils = activation_functions_utils[
+        self.utils: ActivationFunction = activation_functions_utils[
             basic_info.activation_function_name
         ]
         self.weights: np.ndarray = weights
@@ -85,7 +85,7 @@ class NeuralNetwork:
     def _create_hidden_layers(hidden_layers_info: List[NeuralNetworkHiddenLayerInfo]) -> List[NeuralNetworkHiddenLayer]:
         hidden_layers = []
         for layer_info, next_layer_info in zip(
-                hidden_layers_info[0:-1], hidden_layers_info[1:]
+                hidden_layers_info[:-1], hidden_layers_info[1:]
         ):
             weights = np.random.rand(
                 next_layer_info.neurons_count, layer_info.neurons_count,
