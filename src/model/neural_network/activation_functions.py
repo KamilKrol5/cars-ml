@@ -1,23 +1,73 @@
+from abc import ABC, abstractmethod
+
 import numpy as np
 
-tanh = np.tanh
+
+class Activation(ABC):
+    @staticmethod
+    @abstractmethod
+    def value(x: np.ndarray) -> np.ndarray:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def derivative(x: np.ndarray) -> np.ndarray:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def derivative_from_value(x: np.ndarray) -> np.ndarray:
+        raise NotImplementedError
 
 
-def tanh_derivative_from_value(x: np.ndarray) -> np.ndarray:
-    return 1.0 - x ** 2
+class Sigmoid(Activation):
+    @staticmethod
+    def value(x: np.ndarray) -> np.ndarray:
+        return 1.0 / (1.0 + np.exp(np.negative(x)))
+
+    @staticmethod
+    def derivative(x: np.ndarray) -> np.ndarray:
+        fx = Sigmoid.value(x)
+        return Sigmoid.derivative_from_value(fx)
+
+    @staticmethod
+    def derivative_from_value(x: np.ndarray) -> np.ndarray:
+        return x * (1.0 - x)
+
+    def __repr__(self) -> str:
+        return "sigmoid"
 
 
-def sigmoid(x: np.ndarray) -> np.ndarray:
-    return 1 / (1 + np.exp(-x))
+class Relu(Activation):
+    @staticmethod
+    def value(x: np.ndarray) -> np.ndarray:
+        return np.maximum(x, 0)
+
+    @staticmethod
+    def derivative(x: np.ndarray) -> np.ndarray:
+        return np.where(x > 0, 1, 0)
+
+    @staticmethod
+    def derivative_from_value(x: np.ndarray) -> np.ndarray:
+        return np.where(x > 0, 1, 0)
+
+    def __repr__(self) -> str:
+        return "ReLU"
 
 
-def sigmoid_derivative_from_value(x: np.ndarray) -> np.ndarray:
-    return x * (1.0 - x)
+class Tanh(Activation):
+    @staticmethod
+    def value(x: np.ndarray) -> np.ndarray:
+        return np.tanh(x)
 
+    @staticmethod
+    def derivative(x: np.ndarray) -> np.ndarray:
+        fx = Tanh.value(x)
+        return Tanh.derivative_from_value(fx)
 
-def relu(x: np.ndarray) -> np.ndarray:
-    return np.maximum(0, x)
+    @staticmethod
+    def derivative_from_value(x: np.ndarray) -> np.ndarray:
+        return 1.0 - np.square(x)
 
-
-def relu_derivative_from_value(x: np.ndarray) -> np.ndarray:
-    return np.where(x > 0, 1, 0)
+    def __repr__(self) -> str:
+        return "tanh"

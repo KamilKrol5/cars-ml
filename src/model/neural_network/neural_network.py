@@ -3,10 +3,8 @@ from typing import List
 
 import numpy as np
 
-from model.neural_network.activation_function_utils import (
-    activation_functions_utils,
-    ActivationFunction,
-)
+from model.neural_network.activation_function_utils import activation_functions_utils
+from model.neural_network.activation_functions import Activation
 
 np.set_printoptions(suppress=True)
 
@@ -25,7 +23,7 @@ class NeuralNetworkHiddenLayer:
         biases: np.ndarray,
     ):
         self.info = basic_info
-        self.utils: ActivationFunction = activation_functions_utils[
+        self.activation: Activation = activation_functions_utils[
             basic_info.activation_function_name
         ]
         self.weights: np.ndarray = weights
@@ -77,14 +75,12 @@ class NeuralNetwork:
             raise ValueError("Dimension mismatch")
 
         values = training_data_set
-        for layer, next_layer in zip(self.hidden_layers[:-1], self.hidden_layers[1:]):
-            values = layer.utils.function(
+        for layer in self.hidden_layers:
+            values = layer.activation.value(
                 np.dot(values, layer.weights.T) + layer.biases
             )
-        last_hidden_layer = self.hidden_layers[-1]
-        return last_hidden_layer.utils.function(
-            np.dot(values, last_hidden_layer.weights.T) + last_hidden_layer.biases
-        )
+
+        return values
 
     def predict(self, input_data_set: np.ndarray) -> np.ndarray:
         output = self._feed_forward(input_data_set)
