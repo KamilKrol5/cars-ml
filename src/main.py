@@ -1,7 +1,7 @@
 from time import sleep
 
 from model.car import Car
-from model.neural_network import NeuralNetwork
+from model.neural_network_old import NeuralNetwork
 from model.sensor import Sensor
 
 
