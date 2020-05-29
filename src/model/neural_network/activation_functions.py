@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Dict
 
 import numpy as np
 
@@ -71,3 +72,10 @@ class Tanh(Activation):
 
     def __repr__(self) -> str:
         return "tanh"
+
+
+activation_functions_utils: Dict[str, Activation] = {
+    "sigmoid": Sigmoid(),
+    "relu": Relu(),
+    "tanh": Tanh(),
+}

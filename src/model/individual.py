@@ -1,4 +1,4 @@
-from model.neural_network import NeuralNetwork
+from model.neural_network.neural_network import NeuralNetwork
 from typing import Optional
 
 

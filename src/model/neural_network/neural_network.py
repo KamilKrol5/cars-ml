@@ -3,24 +3,23 @@ from typing import List
 
 import numpy as np
 
-from model.neural_network.activation_function_utils import activation_functions_utils
-from model.neural_network.activation_functions import Activation
+from model.neural_network.activation_functions import (
+    activation_functions_utils,
+    Activation,
+)
 
 np.set_printoptions(suppress=True)
 
 
 @dataclass
-class NeuralNetworkHiddenLayerInfo:
+class LayerInfo:
     activation_function_name: str
     neurons_count: int
 
 
-class NeuralNetworkHiddenLayer:
+class Layer:
     def __init__(
-        self,
-        basic_info: NeuralNetworkHiddenLayerInfo,
-        weights: np.ndarray,
-        biases: np.ndarray,
+        self, basic_info: LayerInfo, weights: np.ndarray, biases: np.ndarray,
     ):
         self.info = basic_info
         self.activation: Activation = activation_functions_utils[
@@ -36,9 +35,7 @@ class NeuralNetwork:
     """
 
     def __init__(
-        self,
-        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
-        output_neurons_count: int,
+        self, hidden_layers_info: List[LayerInfo], output_neurons_count: int,
     ):
         """
         Args:
@@ -86,9 +83,8 @@ class NeuralNetwork:
 
     @staticmethod
     def _create_hidden_layers(
-        hidden_layers_info: List[NeuralNetworkHiddenLayerInfo],
-        output_neurons_count: int,
-    ) -> List[NeuralNetworkHiddenLayer]:
+        hidden_layers_info: List[LayerInfo], output_neurons_count: int,
+    ) -> List[Layer]:
         hidden_layers = []
         for layer_info, next_layer_info in zip(
             hidden_layers_info[:-1], hidden_layers_info[1:]
@@ -97,7 +93,7 @@ class NeuralNetwork:
                 next_layer_info.neurons_count, layer_info.neurons_count,
             )
             biases = np.random.rand(next_layer_info.neurons_count)
-            hidden_layers.append(NeuralNetworkHiddenLayer(layer_info, weights, biases))
+            hidden_layers.append(Layer(layer_info, weights, biases))
 
         last_hidden_layer_info = hidden_layers_info[-1]
         last_hidden_layer_info_weights = np.random.rand(
@@ -105,7 +101,7 @@ class NeuralNetwork:
         )
         last_hidden_layer_biases = np.random.rand(output_neurons_count)
         hidden_layers.append(
-            NeuralNetworkHiddenLayer(
+            Layer(
                 last_hidden_layer_info,
                 last_hidden_layer_info_weights,
                 last_hidden_layer_biases,
