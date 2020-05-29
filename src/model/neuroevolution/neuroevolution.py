@@ -2,7 +2,7 @@ from typing import Tuple, Dict, Callable, List
 
 import numpy as np
 
-from model.individual import Individual
+from model.neuroevolution.individual import Individual
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
 from model.neural_network_old import NeuralNetwork as NeuralNetworkOld
 
@@ -35,6 +35,8 @@ class Neuroevolution:
             raise Exception(
                 "Cannot compute probability of" "individual with undefined adaptation"
             )
+        # thanks to mypy
+        assert isinstance(individual.adaptation, int)
         return (individual.adaptation / bound_adaptation) ** 3
 
     _MUTATION_CHANCE: float = 0.15
