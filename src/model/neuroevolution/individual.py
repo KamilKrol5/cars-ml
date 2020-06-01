@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -17,3 +17,7 @@ class Individual:
     def get_random_layer(self) -> Layer:
         random_layer: Layer = np.random.choice(self.neural_network.hidden_layers)
         return random_layer
+
+    @staticmethod
+    def get_random_weight_index(neural_network_layer: Layer) -> Tuple:
+        return tuple(np.random.randint(neural_network_layer.weights.shape))

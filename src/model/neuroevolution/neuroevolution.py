@@ -24,7 +24,7 @@ class Neuroevolution:
 
     @staticmethod
     def _reproduction_probability(
-            individual: Individual, bound_adaptation: int
+        individual: Individual, bound_adaptation: int
     ) -> float:
         """
         Probability of reproduction for every given individual
@@ -66,10 +66,10 @@ class Neuroevolution:
     _MUTATION_PROBABILITIES = np.array(_MUTATION_RATE) / sum(_MUTATION_RATE)
 
     def __init__(
-            self,
-            individuals: List[Individual],
-            layers_infos: List[LayerInfo],
-            output_neurons: int,
+        self,
+        individuals: List[Individual],
+        layers_infos: List[LayerInfo],
+        output_neurons: int,
     ) -> None:
         self.individuals: List[Individual] = individuals
         self._layers_infos = layers_infos
@@ -90,7 +90,7 @@ class Neuroevolution:
 
     @classmethod
     def init_with_neural_network_info(
-            cls, layers_infos: List[LayerInfo], output_neurons: int
+        cls, layers_infos: List[LayerInfo], output_neurons: int
     ) -> "Neuroevolution":
         return cls(
             [
@@ -117,28 +117,28 @@ class Neuroevolution:
         # but pre-commit sucks :<
         for i in range(self._GOLDEN_TICKETS, self._INDIVIDUALS):
             if np.random.rand() < self._reproduction_probability(
-                    self.individuals[i], bound_adaptation
+                self.individuals[i], bound_adaptation
             ):
                 parents.append(self.individuals[i])
         return parents
 
     @staticmethod
     def _single_weight_reproduction(
-            mother: NeuralNetworkOld, father: NeuralNetworkOld
+        mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
 
     @staticmethod
     def _single_neuron_reproduction(
-            mother: NeuralNetworkOld, father: NeuralNetworkOld
+        mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
 
     @staticmethod
     def _entire_layer_reproduction(
-            mother: NeuralNetworkOld, father: NeuralNetworkOld
+        mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
@@ -163,9 +163,17 @@ class Neuroevolution:
         return children
 
     @staticmethod
-    def _random_weight_mutation(individual: NeuralNetworkOld) -> None:
-        # TODO
-        pass
+    def _random_weight_mutation(individual: Individual) -> None:
+        """
+        Changes a randomly chosen weight in the neural network to random value from range [-1, 1)
+
+        :param individual: Individual (neural network) to be modified.
+        :return: None
+        """
+        random_layer = individual.get_random_layer()
+        random_index = individual.get_random_weight_index(random_layer)
+        # TODO discuss new weight value's range, update method documentation
+        random_layer.weights[random_index] = np.random.uniform(-1, 1)
 
     @staticmethod
     def _random_bias_mutation(individual: NeuralNetworkOld) -> None:
@@ -181,20 +189,23 @@ class Neuroevolution:
         :return: None
         """
         random_layer = individual.get_random_layer()
-        random_index = tuple(np.random.randint(random_layer.weights.shape))
-        random_layer.weights[random_index] = - random_layer.weights[random_index]
+        random_index = individual.get_random_weight_index(random_layer)
+        random_layer.weights[random_index] = -random_layer.weights[random_index]
 
     @staticmethod
     def _multiply_neuron_weights_mutation(individual: Individual) -> None:
         """
-        Multiplies all weights for single randomly chosen neuron, from randomly chosen layer,
-        by random numbers from the range [0.5, 1.5]. There is a random multiplier chosen for every single weight.
+        Multiplies all weights for single randomly chosen neuron,
+        from randomly chosen layer, by random numbers from the range [0.5, 1.5].
+        There is a random multiplier chosen for every single weight.
         :param individual: Individual to be changed.
         :return: None
         """
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
-        multipliers = np.random.uniform(low=0.5, high=1.5, size=(random_layer.weights.shape[1]))
+        multipliers = np.random.uniform(
+            low=0.5, high=1.5, size=(random_layer.weights.shape[1])
+        )
         random_layer.weights[random_neuron_index] *= multipliers
 
     @staticmethod
@@ -207,7 +218,9 @@ class Neuroevolution:
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
         # TODO decide the range of new random weights
-        random_layer.weights[random_neuron_index] = np.random.random((random_layer.weights.shape[1]))
+        random_layer.weights[random_neuron_index] = np.random.random(
+            (random_layer.weights.shape[1])
+        )
 
     def _mutation(self, individuals: List[Individual]) -> List[Individual]:
         for individual in individuals:
