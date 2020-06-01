@@ -19,10 +19,7 @@ class Individual:
         return random_layer
 
     def get_random_layer_index(self) -> int:
-        return np.random.randint(
-            low=0,
-            high=len(self.neural_network.hidden_layers)
-        )
+        return np.random.randint(low=0, high=len(self.neural_network.hidden_layers))
 
     @staticmethod
     def get_random_weight_index(neural_network_layer: Layer) -> Tuple:

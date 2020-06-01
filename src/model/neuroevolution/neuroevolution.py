@@ -124,9 +124,7 @@ class Neuroevolution:
 
     @staticmethod
     def _weight_swap_reproduction(
-            father1: Individual,
-            father2: Individual,
-            weights_to_be_swapped: int = 1
+        father1: Individual, father2: Individual, weights_to_be_swapped: int = 1
     ) -> Tuple[Individual, Individual]:
         """
         Return two new individuals (children). They are created by
@@ -140,11 +138,20 @@ class Neuroevolution:
         child_2 = deepcopy(father2)
         for _ in range(weights_to_be_swapped):
             random_layer_index = child_1.get_random_layer_index()
-            child_1_rand_layer = child_1.neural_network.hidden_layers[random_layer_index]
-            child_2_rand_layer = child_2.neural_network.hidden_layers[random_layer_index]
+            child_1_rand_layer = child_1.neural_network.hidden_layers[
+                random_layer_index
+            ]
+            child_2_rand_layer = child_2.neural_network.hidden_layers[
+                random_layer_index
+            ]
             weight_index = Individual.get_random_weight_index(child_1_rand_layer)
-            child_1_rand_layer.weights[weight_index], child_2_rand_layer.weights[weight_index] = \
-                child_2_rand_layer.weights[weight_index], child_1_rand_layer.weights[weight_index]
+            (
+                child_1_rand_layer.weights[weight_index],
+                child_2_rand_layer.weights[weight_index],
+            ) = (
+                child_2_rand_layer.weights[weight_index],
+                child_1_rand_layer.weights[weight_index],
+            )
         return child_1, child_2
 
     @staticmethod
@@ -163,11 +170,17 @@ class Neuroevolution:
         child_2 = deepcopy(mother2)
         for _ in range(neurons_to_swap):
             random_layer_index = child_1.get_random_layer_index()
-            child_1_rand_layer_w = child_1.neural_network.hidden_layers[random_layer_index].weights
-            child_2_rand_layer_w = child_2.neural_network.hidden_layers[random_layer_index].weights
+            child_1_rand_layer_w = child_1.neural_network.hidden_layers[
+                random_layer_index
+            ].weights
+            child_2_rand_layer_w = child_2.neural_network.hidden_layers[
+                random_layer_index
+            ].weights
             neuron_index = np.random.randint(0, child_2_rand_layer_w.shape[0])
-            child_1_rand_layer_w[neuron_index], child_2_rand_layer_w[neuron_index] = \
-                child_2_rand_layer_w[neuron_index], child_1_rand_layer_w[neuron_index].copy()
+            child_1_rand_layer_w[neuron_index], child_2_rand_layer_w[neuron_index] = (
+                child_2_rand_layer_w[neuron_index],
+                child_1_rand_layer_w[neuron_index].copy(),
+            )
         return child_1, child_2
 
     @staticmethod
@@ -190,8 +203,10 @@ class Neuroevolution:
             layer_index = child_1.get_random_layer_index()
             child_1_rand_layers = child_1.neural_network.hidden_layers
             child_2_rand_layers = child_2.neural_network.hidden_layers
-            child_2_rand_layers[layer_index], child_1_rand_layers[layer_index] = \
-                child_1_rand_layers[layer_index], child_2_rand_layers[layer_index]
+            child_2_rand_layers[layer_index], child_1_rand_layers[layer_index] = (
+                child_1_rand_layers[layer_index],
+                child_2_rand_layers[layer_index],
+            )
         return child_1, child_2
 
     def _reproduction(self, parents: List[Individual]) -> List[Individual]:
