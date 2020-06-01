@@ -1,9 +1,9 @@
+from copy import deepcopy
 from typing import Tuple, Dict, Callable, List
 
 import numpy as np
 
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
-from model.neural_network_old import NeuralNetwork as NeuralNetworkOld
 from model.neuroevolution.individual import Individual
 
 
@@ -76,9 +76,9 @@ class Neuroevolution:
         self._output_neurons = output_neurons
         self._parents: List[Individual] = []
         self._reproduce: Dict[int, Callable] = {
-            0: self._single_weight_reproduction,
-            1: self._single_neuron_reproduction,
-            2: self._entire_layer_reproduction,
+            0: self._weight_swap_reproduction,
+            1: self._neuron_swap_reproduction,
+            2: self._layer_swap_reproduction,
         }
         self._mutate: Dict[int, Callable] = {
             0: self._random_weight_mutation,
@@ -123,25 +123,76 @@ class Neuroevolution:
         return parents
 
     @staticmethod
-    def _single_weight_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
-    ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
-        # TODO
-        return NeuralNetworkOld(), NeuralNetworkOld()
+    def _weight_swap_reproduction(
+            father1: Individual,
+            father2: Individual,
+            weights_to_be_swapped: int = 1
+    ) -> Tuple[Individual, Individual]:
+        """
+        Return two new individuals (children). They are created by
+        swapping one or more parents's weights.
+
+        :param father1: First parent
+        :param father2: Second parent
+        :return: Tuple consisting two new individuals.
+        """
+        child_1 = deepcopy(father1)
+        child_2 = deepcopy(father2)
+        for _ in range(weights_to_be_swapped):
+            random_layer_index = child_1.get_random_layer_index()
+            child_1_rand_layer = child_1.neural_network.hidden_layers[random_layer_index]
+            child_2_rand_layer = child_2.neural_network.hidden_layers[random_layer_index]
+            weight_index = Individual.get_random_weight_index(child_1_rand_layer)
+            child_1_rand_layer.weights[weight_index], child_2_rand_layer.weights[weight_index] = \
+                child_2_rand_layer.weights[weight_index], child_1_rand_layer.weights[weight_index]
+        return child_1, child_2
 
     @staticmethod
-    def _single_neuron_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
-    ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
-        # TODO
-        return NeuralNetworkOld(), NeuralNetworkOld()
+    def _neuron_swap_reproduction(
+        mother1: Individual, mother2: Individual, neurons_to_swap: int = 1
+    ) -> Tuple[Individual, Individual]:
+        """
+        Return two new individuals (children). They are created by
+        swapping one or more randomly chosen neurons.
+
+        :param mother1: First parent
+        :param mother2: Second parent
+        :return: Tuple consisting two new individuals.
+        """
+        child_1 = deepcopy(mother1)
+        child_2 = deepcopy(mother2)
+        for _ in range(neurons_to_swap):
+            random_layer_index = child_1.get_random_layer_index()
+            child_1_rand_layer_w = child_1.neural_network.hidden_layers[random_layer_index].weights
+            child_2_rand_layer_w = child_2.neural_network.hidden_layers[random_layer_index].weights
+            neuron_index = np.random.randint(0, child_2_rand_layer_w.shape[0])
+            child_1_rand_layer_w[neuron_index], child_2_rand_layer_w[neuron_index] = \
+                child_2_rand_layer_w[neuron_index], child_1_rand_layer_w[neuron_index].copy()
+        return child_1, child_2
 
     @staticmethod
-    def _entire_layer_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
-    ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
-        # TODO
-        return NeuralNetworkOld(), NeuralNetworkOld()
+    def _layer_swap_reproduction(
+        mother: Individual, father: Individual, layers_to_swap: int = 1
+    ) -> Tuple[Individual, Individual]:
+        """
+        Return two new individuals (children). They are created by
+        swapping one or more randomly chosen layers.
+        All data from one layer (weights and biases) is swapped
+        with all data from another layer.
+
+        :param mother: First parent
+        :param father: Second parent
+        :return: Tuple consisting two new individuals.
+        """
+        child_1 = deepcopy(mother)
+        child_2 = deepcopy(father)
+        for _ in range(layers_to_swap):
+            layer_index = child_1.get_random_layer_index()
+            child_1_rand_layers = child_1.neural_network.hidden_layers
+            child_2_rand_layers = child_2.neural_network.hidden_layers
+            child_2_rand_layers[layer_index], child_1_rand_layers[layer_index] = \
+                child_1_rand_layers[layer_index], child_2_rand_layers[layer_index]
+        return child_1, child_2
 
     def _reproduction(self, parents: List[Individual]) -> List[Individual]:
         children_remain = self._INDIVIDUALS - len(parents)
