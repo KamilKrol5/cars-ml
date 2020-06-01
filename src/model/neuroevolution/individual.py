@@ -1,5 +1,8 @@
-from model.neural_network.neural_network import NeuralNetwork
 from typing import Optional
+
+import numpy as np
+
+from model.neural_network.neural_network import NeuralNetwork, Layer
 
 
 class Individual:
@@ -10,3 +13,7 @@ class Individual:
     @property
     def neural_network(self) -> NeuralNetwork:
         return self._neural_network
+
+    def get_random_layer(self) -> Layer:
+        random_layer: Layer = np.random.choice(self.neural_network.hidden_layers)
+        return random_layer

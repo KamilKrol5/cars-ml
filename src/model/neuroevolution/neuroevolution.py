@@ -2,9 +2,9 @@ from typing import Tuple, Dict, Callable, List
 
 import numpy as np
 
-from model.neuroevolution.individual import Individual
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
 from model.neural_network_old import NeuralNetwork as NeuralNetworkOld
+from model.neuroevolution.individual import Individual
 
 
 class Neuroevolution:
@@ -24,7 +24,7 @@ class Neuroevolution:
 
     @staticmethod
     def _reproduction_probability(
-        individual: Individual, bound_adaptation: int
+            individual: Individual, bound_adaptation: int
     ) -> float:
         """
         Probability of reproduction for every given individual
@@ -66,10 +66,10 @@ class Neuroevolution:
     _MUTATION_PROBABILITIES = np.array(_MUTATION_RATE) / sum(_MUTATION_RATE)
 
     def __init__(
-        self,
-        individuals: List[Individual],
-        layers_infos: List[LayerInfo],
-        output_neurons: int,
+            self,
+            individuals: List[Individual],
+            layers_infos: List[LayerInfo],
+            output_neurons: int,
     ) -> None:
         self.individuals: List[Individual] = individuals
         self._layers_infos = layers_infos
@@ -90,12 +90,12 @@ class Neuroevolution:
 
     @classmethod
     def init_with_neural_network_info(
-        cls, layers_infos: List[LayerInfo], output_neurons: int
+            cls, layers_infos: List[LayerInfo], output_neurons: int
     ) -> "Neuroevolution":
         return cls(
             [
                 Individual(NeuralNetwork(layers_infos, output_neurons))
-                for i in range(cls._INDIVIDUALS)
+                for _ in range(cls._INDIVIDUALS)
             ],
             layers_infos,
             output_neurons,
@@ -117,28 +117,28 @@ class Neuroevolution:
         # but pre-commit sucks :<
         for i in range(self._GOLDEN_TICKETS, self._INDIVIDUALS):
             if np.random.rand() < self._reproduction_probability(
-                self.individuals[i], bound_adaptation
+                    self.individuals[i], bound_adaptation
             ):
                 parents.append(self.individuals[i])
         return parents
 
     @staticmethod
     def _single_weight_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
+            mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
 
     @staticmethod
     def _single_neuron_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
+            mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
 
     @staticmethod
     def _entire_layer_reproduction(
-        mother: NeuralNetworkOld, father: NeuralNetworkOld
+            mother: NeuralNetworkOld, father: NeuralNetworkOld
     ) -> Tuple[NeuralNetworkOld, NeuralNetworkOld]:
         # TODO
         return NeuralNetworkOld(), NeuralNetworkOld()
@@ -173,8 +173,16 @@ class Neuroevolution:
         pass
 
     @staticmethod
-    def _change_weight_sign_mutation(individual: NeuralNetworkOld) -> None:
-        # TODO
+    def _change_weight_sign_mutation(individual: Individual) -> None:
+        """
+        Changes a sign of randomly chosen weight in the neural network.
+
+        :param individual: Individual (neural network) to be modified.
+        :return: None
+        """
+        random_layer = individual.get_random_layer()
+        random_index = np.random.randint(tuple(random_layer.weights.shape))
+        random_layer.weights[random_index] = - random_layer.weights[random_index]
         pass
 
     @staticmethod
