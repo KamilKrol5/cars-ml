@@ -15,6 +15,13 @@ class TrackSegment:
     Walls should be oriented in the same direction
     """
 
+    # __dict__ needed for cached properties
+    __slots__ = (
+        "left_wall",
+        "right_wall",
+        "__dict__",
+    )
+
     left_wall: Wall
     right_wall: Wall
 

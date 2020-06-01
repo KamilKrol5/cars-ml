@@ -9,6 +9,7 @@ from utils import pairwise
 
 @dataclass
 class Wall:
+    __slots__ = ("line_segment",)
     line_segment: LineSegment
 
     def intersects(self, shape: Polygon) -> bool:

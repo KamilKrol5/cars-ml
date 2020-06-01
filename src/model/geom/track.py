@@ -16,6 +16,7 @@ SegmentId = int
 
 @dataclass
 class Track:
+    __slots__ = ("segments",)
     segments: List[TrackSegment]
 
     @classmethod

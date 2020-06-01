@@ -12,6 +12,7 @@ from model.geom.wall import Wall
 
 @dataclass
 class Sensor:
+    __slots__ = ("ray",)
     ray: Ray
 
     def check_distance(self, wall: Wall) -> Optional[float]:
