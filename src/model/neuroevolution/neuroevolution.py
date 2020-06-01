@@ -185,9 +185,17 @@ class Neuroevolution:
         random_layer.weights[random_index] = - random_layer.weights[random_index]
 
     @staticmethod
-    def _multiply_neuron_weights_mutation(individual: NeuralNetworkOld) -> None:
-        # TODO
-        pass
+    def _multiply_neuron_weights_mutation(individual: Individual) -> None:
+        """
+        Multiplies all weights for single randomly chosen neuron, from randomly chosen layer,
+        by random numbers from the range [0.5, 1.5]. There is a random multiplier chosen for every single weight.
+        :param individual: Individual to be changed.
+        :return: None
+        """
+        random_layer = individual.get_random_layer()
+        random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
+        multipliers = np.random.uniform(low=0.5, high=1.5, size=(random_layer.weights.shape[1]))
+        random_layer.weights[random_neuron_index] *= multipliers
 
     @staticmethod
     def _random_neuron_weights_mutation(individual: Individual) -> None:
