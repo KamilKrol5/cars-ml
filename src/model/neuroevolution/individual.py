@@ -21,3 +21,7 @@ class Individual:
     @staticmethod
     def get_random_weight_index(neural_network_layer: Layer) -> Tuple:
         return tuple(np.random.randint(neural_network_layer.weights.shape))
+
+    @staticmethod
+    def get_random_bias_index(neural_network_layer: Layer) -> int:
+        return np.random.randint(neural_network_layer.biases.shape[0])

@@ -176,8 +176,17 @@ class Neuroevolution:
         random_layer.weights[random_index] = np.random.uniform(-1, 1)
 
     @staticmethod
-    def _random_bias_mutation(individual: NeuralNetworkOld) -> None:
-        # TODO
+    def _random_bias_mutation(individual: Individual) -> None:
+        """
+        Changes a randomly chosen bias in the neural network to random value from range [-1, 1)
+
+        :param individual: Individual (neural network) to be modified.
+        :return: None
+        """
+        random_layer = individual.get_random_layer()
+        random_index = individual.get_random_bias_index(random_layer)
+        # TODO discuss new bias value's range, update method documentation
+        random_layer.biases[random_index] = np.random.uniform(-1, 1)
         pass
 
     @staticmethod
