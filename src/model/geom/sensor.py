@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-import planar
+from planar import EPSILON
 from planar.line import Ray, LineSegment
 from planar.transform import Affine
 
@@ -24,7 +24,7 @@ class Sensor:
         q_p = q - p
         rxs = r.cross(s)
 
-        if abs(rxs) < planar.EPSILON:
+        if abs(rxs) < EPSILON:
             # parallel
             return None
 
@@ -41,7 +41,7 @@ class Sensor:
             return None
 
     def transform(self, trans: Affine) -> None:
-        trans.itransform(self.ray)
+        self.ray *= trans
 
     # TODO: use check_distance
     def detect(self, position_x: float, position_y: float, turn: float) -> np.ndarray:

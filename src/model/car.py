@@ -1,13 +1,15 @@
-from math import sin, cos, pi
-from typing import Tuple
+from typing import Tuple, List, ClassVar
+
+from model.geom.track import Track
+from model.neural_network_old import NeuralNetwork
+from model.geom.directed_rect import DirectedRectangle
+from model.geom.sensor import Sensor
 
 import numpy as np
 
-from model.neural_network_old import NeuralNetwork
-from model.geom.sensor import Sensor
-
 
 class Car:
+    TRACTION: ClassVar[float] = 1.0
     _ACCELERATION_RATE: float = 10
     _BRAKING_RATE: float = 10  # braking means "accelerate backwards" also
     _MAX_FORWARD_VELOCITY: float = 200
@@ -15,84 +17,47 @@ class Car:
     _ROTATION_RATE: float = 1
     _SIZE: float = 10
 
+    __slots__ = ("rect", "sensors", "neural_network", "speed")
+
     def __init__(
         self,
+        size: Tuple[float, float],
+        sensors: List[Sensor],
         neural_network: NeuralNetwork,
-        sensor: Sensor,
-        position: Tuple[float, float, float],
-    ):
-        self._position_x: float = position[0]
-        self._position_y: float = position[1]
-        self._velocity: float = 0
-        self._turn: float = position[2]
+    ) -> None:
+        """Creates a new car at point (0,0) headed in the X axis direction."""
+        self.rect = DirectedRectangle.new_origin_x(*size)
+        self.sensors = sensors
+        self.neural_network = neural_network
+        self.speed = 0.0
 
-        self._neural_network: NeuralNetwork = neural_network
-        self._sensor: Sensor = sensor
-        self._crashed: bool = False
+    def sense_surroundings(self, track: Track) -> List[float]:
+        # TODO: 0 -> active_sector
+        return [track.sense_closest(sensor, 0) for sensor in self.sensors]
 
-    @property
-    def position_x(self) -> float:
-        return self._position_x
+    def check_collision(self, track: Track) -> bool:
+        # TODO
+        return False
 
-    @property
-    def position_y(self) -> float:
-        return self._position_y
-
-    @property
-    def velocity(self) -> float:
-        return self._velocity
-
-    @property
-    def turn(self) -> float:
-        return self._turn
-
-    @property
-    def crashed(self) -> bool:
-        return self._crashed
-
-    def _accelerate(self, acceleration: float) -> None:
-        if acceleration > 0:
-            self._velocity += Car._ACCELERATION_RATE
-            if self._velocity > Car._MAX_FORWARD_VELOCITY:
-                self._velocity = Car._MAX_FORWARD_VELOCITY
-        elif acceleration < 0:
-            self._velocity -= Car._BRAKING_RATE
-            if self._velocity < -Car._MAX_BACKWARD_VELOCITY:
-                self._velocity = -Car._MAX_BACKWARD_VELOCITY
-
-    def _rotate(self, rotation: float) -> None:
-        if (
-            0.05 * -Car._MAX_BACKWARD_VELOCITY
-            < self._velocity
-            < 0.05 * Car._MAX_FORWARD_VELOCITY
-        ):
-            return  # vehicle is not able to rotate when goes very slow to avoid rotation "like tank"
-        if rotation > 0:
-            self._turn += Car._ROTATION_RATE
-        elif rotation < 0:
-            self._turn -= Car._ROTATION_RATE
-
-    def _go(self) -> None:
-        self._position_x += sin(self._turn / 180 * pi) * self._velocity
-        self._position_y += cos(self._turn / 180 * pi) * self._velocity
-
-    def _check_collision_and_set_crashed(self) -> None:
-        #  set self._crashed using self._sensor or basing on last detection
-        self._crashed = False
-
-    def tick(self) -> None:
-        if self._crashed:
-            return
-        detection: np.ndarray = self._sensor.detect(
-            self._position_x, self._position_y, self._turn
+    def move(self, turning_rate: float, delta_time: float) -> None:
+        transform = self.rect.turn_curve_transform(
+            self.speed, Car.TRACTION, turning_rate, delta_time
         )
-        acceleration, rotation = self._neural_network.compute(detection)
-        self._accelerate(acceleration)
-        self._rotate(rotation)
-        self._go()
-        self._check_collision_and_set_crashed()
-        if self._crashed:
-            self._velocity = 0
+        for sensor in self.sensors:
+            sensor.transform(transform)
+        self.rect.transform(transform)
+
+    def update_speed(self, acceleration: float, delta_time: float) -> None:
+        self.speed += acceleration * delta_time
+
+    def tick(self, track: Track, delta_time: float) -> None:
+        distances = self.sense_surroundings(track)
+        turning_rate, acceleration = self.neural_network.compute(np.array(distances))
+        self.move(turning_rate, delta_time)
+        if self.check_collision(track):
+            # TODO: communicate collision outside
+            return
+        self.update_speed(acceleration, delta_time)
 
     def go_brrrr(self) -> None:
         print("brrr!")

@@ -1,11 +1,11 @@
 import pygame
-
+from planar import Point
 from planar.line import Ray
 
 from model.car import Car
-from model.neural_network_old import NeuralNetwork
 from model.geom.sensor import Sensor
-
+from model.geom.track import Track
+from model.neural_network_old import NeuralNetwork
 from view.Action import Action, ActionType
 from view.Menu import Menu
 from view.Window import Window
@@ -14,13 +14,28 @@ WINDOW_NAME = "CarsML"
 WINDOW_SIZE = (1280, 854)
 
 
-def main() -> None:
+def main_no_ui() -> None:
+    from time import sleep
+
     neural_network = NeuralNetwork()
     sensor = Sensor(Ray((0, 0), (0, 1)))  # TODO: move construction elsewhere
-    car = Car(neural_network, sensor, (0, 0, 45))
-    car.tick()
-    car.go_brrrr()
 
+    car = Car((10, 20), [sensor], neural_network)
+
+    track = Track.from_points(
+        [
+            (Point(-1.0, -1.0), Point(-1.0, 1.0)),
+            (Point(1.0, -1.0), Point(1.0, 1.0)),
+            (Point(2.0, -1.0), Point(2.0, 1.0)),
+        ]
+    )
+    while True:
+        sleep(1)
+        car.tick(track, 1.0)
+        car.go_brrrr()
+
+
+def main() -> None:
     window = Window(WINDOW_NAME, WINDOW_SIZE)
 
     menu_options = {
