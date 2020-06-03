@@ -1,6 +1,7 @@
 from typing import Tuple, Any, Optional, Union, Dict
 
 import pygame
+from pygame.surface import Surface
 
 from view import Colors
 from view.Action import ActionType
@@ -8,6 +9,8 @@ from view.View import View
 
 
 class Window:
+    loading_screen: Union[View, Surface, None] = None
+
     def __init__(
         self,
         name: str,
@@ -34,11 +37,9 @@ class Window:
 
             self._screen.fill(Colors.BLACK)
 
-            if (
-                x := self._view_manager.active_view.draw(
-                    self._screen, event_passthrough
-                )
-            ) is not None:
+            if x := self._view_manager.active_view.draw(
+                self._screen, event_passthrough
+            ):
                 if x.type == ActionType.SYS_EXIT:
                     self._closing = True
                 elif x.type == ActionType.CHANGE_VIEW:

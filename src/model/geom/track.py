@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from functools import cached_property
 from typing import List, Tuple, Iterable, Optional, cast
 
-from planar import Point
+from planar import Point, Vec2
 from planar.line import LineSegment
 from planar.polygon import Polygon
 
@@ -11,12 +12,13 @@ from model.geom.sensor import Sensor
 from model.geom.wall import Wall
 from utils import pairwise
 
+
 SegmentId = int
 
 
 @dataclass
 class Track:
-    __slots__ = ("segments",)
+    __slots__ = ("segments", "__dict__")
     segments: List[TrackSegment]
 
     @classmethod
@@ -97,3 +99,23 @@ class Track:
             if self.segments[segment_id].is_point_inside(center):
                 return segment_id
         raise RuntimeError("none of the track's segments contain the given point")
+
+    @cached_property
+    def boundaries(self) -> Tuple[Vec2, Vec2]:
+        """:return: Tuple[Vec2, Vec2] - upper left and lower right corners of rectangle enclosing track
+        """
+        first_point = self.segments[0].right_wall.line_segment.points[0]
+        min_x = first_point.x
+        min_y = first_point.y
+        max_x = first_point.x
+        max_y = first_point.y
+        for segment in self.segments:
+            for point in (
+                segment.left_wall.line_segment.points
+                + segment.right_wall.line_segment.points
+            ):
+                min_x = min(min_x, point.x)
+                min_y = min(min_y, point.y)
+                max_x = max(max_x, point.x)
+                max_y = max(max_y, point.y)
+        return Vec2(min_x, min_y), Vec2(max_x, max_y)
