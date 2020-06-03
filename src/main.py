@@ -60,8 +60,6 @@ def main() -> None:
         "../resources/graphics/menu-background.png"
     )
     menu.logo_image = pygame.image.load("../resources/graphics/logo.png")
-    # print(tracks[0]['points'])
-    multiplier = 100  # fixme for tests, duplicates TrackView.scale
 
     track = Track.from_points(tracks[0]["points"])
     sim = Simulation(track)
