@@ -82,10 +82,11 @@ class Neuroevolution:
             environment,
         )
 
-    def _sort_individuals(self) -> None:
+    def _sort_individuals_and_kill_unnecessary(self) -> None:
         self.individuals.sort(
             key=lambda individual: individual.adaptation, reverse=True
         )
+        self.individuals = self.individuals[: self._INDIVIDUALS]
 
     def _selection(self) -> List[Individual]:
         bound_adaptation = self.individuals[self._GOLDEN_TICKETS].adaptation
@@ -128,17 +129,19 @@ class Neuroevolution:
                 )(individual)
         return individuals
 
-    def evolve(self) -> None:
+    def evolve(self, with_parents: bool) -> None:
         adaptations = self._environment.compute_adaptations(
-            nn.neural_network for nn in self._new_generation
+            (child.neural_network for child in self._new_generation),
+            (parent.neural_network for parent in self.individuals)
+            if with_parents
+            else [],
         )
         new_individuals = [
-            Individual(i.neural_network, adaptation)
-            for i, adaptation in zip(self._new_generation, adaptations)
+            Individual(child.neural_network, adaptation)
+            for child, adaptation in zip(self._new_generation, adaptations)
         ]
         self.individuals.extend(new_individuals)
-        self._sort_individuals()
-        parents: List[Individual] = self._selection()
-        self.individuals = parents
-        children: List[ChildIndividual] = self._reproduction(parents)
+        self._sort_individuals_and_kill_unnecessary()
+        self._parents = self._selection()
+        children: List[ChildIndividual] = self._reproduction(self._parents)
         self._new_generation = self._mutation(children)
