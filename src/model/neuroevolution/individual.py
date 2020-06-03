@@ -35,8 +35,8 @@ class ChildIndividual:
         """
         Changes a randomly chosen weight in the neural network to random value from range [-1, 1)
 
-        :param individual: Individual (neural network) to be modified.
-        :return: None
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
         """
         random_layer = individual.get_random_layer()
         random_index = individual.get_random_weight_index(random_layer)
@@ -48,22 +48,21 @@ class ChildIndividual:
         """
         Changes a randomly chosen bias in the neural network to random value from range [-1, 1)
 
-        :param individual: Individual (neural network) to be modified.
-        :return: None
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
         """
         random_layer = individual.get_random_layer()
         random_index = individual.get_random_bias_index(random_layer)
         # TODO discuss new bias value's range, update method documentation
         random_layer.biases[random_index] = np.random.uniform(-1, 1)
-        pass
 
     @staticmethod
     def change_weight_sign_mutation(individual: "ChildIndividual") -> None:
         """
         Changes a sign of randomly chosen weight in the neural network.
 
-        :param individual: Individual (neural network) to be modified.
-        :return: None
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
         """
         random_layer = individual.get_random_layer()
         random_index = individual.get_random_weight_index(random_layer)
@@ -75,8 +74,9 @@ class ChildIndividual:
         Multiplies all weights for single randomly chosen neuron,
         from randomly chosen layer, by random numbers from the range [0.5, 1.5].
         There is a random multiplier chosen for every single weight.
-        :param individual: Individual to be changed.
-        :return: None
+
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
         """
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
@@ -89,8 +89,9 @@ class ChildIndividual:
     def random_neuron_weights_mutation(individual: "ChildIndividual") -> None:
         """
         Changes all weights for single randomly chosen neuron from randomly chosen layer.
-        :param individual: Individual to be changed.
-        :return: None
+
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
         """
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
@@ -110,30 +111,36 @@ ChildIndividual.available_mutations = [
 
 
 @dataclass
-class Individual:
+class AdultIndividual:
     neural_network: NeuralNetwork
     adaptation: float
 
     available_reproductions: ClassVar[
         List[
             Callable[
-                ["Individual", "Individual"], Tuple[ChildIndividual, ChildIndividual]
+                ["AdultIndividual", "AdultIndividual"],
+                Tuple[ChildIndividual, ChildIndividual],
             ]
         ]
     ]
 
     @staticmethod
     def weight_swap_reproduction(
-        father1: "Individual", father2: "Individual", weights_to_be_swapped: int = 1
+        father1: "AdultIndividual",
+        father2: "AdultIndividual",
+        weights_to_be_swapped: int = 1,
     ) -> Tuple[ChildIndividual, ChildIndividual]:
         """
         Return two new individuals (children). They are created by
         swapping one or more parents's weights.
 
-        :param father1: First parent
-        :param father2: Second parent
-        :param weights_to_be_swapped: number of weights to be swapped
-        :return: Tuple consisting two new individuals.
+        Args:
+            father1 (AdultIndividual): First parent
+            father2 (AdultIndividual): Second parent
+            weights_to_be_swapped (int): Number of weights to be swapped
+
+        Returns:
+            Tuple[ChildIndividual, ChildIndividual]: Tuple consisting two new individuals.
         """
         child_1 = ChildIndividual(deepcopy(father1.neural_network))
         child_2 = ChildIndividual(deepcopy(father2.neural_network))
@@ -157,16 +164,19 @@ class Individual:
 
     @staticmethod
     def neuron_swap_reproduction(
-        mother1: "Individual", mother2: "Individual", neurons_to_swap: int = 1
+        mother1: "AdultIndividual", mother2: "AdultIndividual", neurons_to_swap: int = 1
     ) -> Tuple[ChildIndividual, ChildIndividual]:
         """
         Return two new individuals (children). They are created by
         swapping one or more randomly chosen neurons.
 
-        :param mother1: First parent
-        :param mother2: Second parent
-        :param neurons_to_swap: Number of neurons to be swapped
-        :return: Tuple consisting two new individuals.
+        Args:
+            mother1 (AdultIndividual): First parent
+            mother2 (AdultIndividual): Second parent
+            neurons_to_swap (int): Number of neurons to be swapped
+
+        Returns:
+            Tuple[ChildIndividual, ChildIndividual]: Tuple consisting two new individuals.
         """
         child_1 = ChildIndividual(deepcopy(mother1.neural_network))
         child_2 = ChildIndividual(deepcopy(mother2.neural_network))
@@ -187,7 +197,7 @@ class Individual:
 
     @staticmethod
     def layer_swap_reproduction(
-        mother: "Individual", father: "Individual", layers_to_swap: int = 1
+        mother: "AdultIndividual", father: "AdultIndividual", layers_to_swap: int = 1
     ) -> Tuple[ChildIndividual, ChildIndividual]:
         """
         Return two new individuals (children). They are created by
@@ -195,10 +205,12 @@ class Individual:
         All data from one layer (weights and biases) is swapped
         with all data from another layer.
 
-        :param mother: First parent
-        :param father: Second parent
-        :param layers_to_swap: Number of layers to be swapped
-        :return: Tuple consisting two new individuals.
+        mother (Individual): First parent
+        father (Individual): Second parent
+        layers_to_swap (int): Number of layers to be swapped
+
+        Returns:
+            Tuple[ChildIndividual, ChildIndividual]: Tuple consisting two new individuals.
         """
         child_1 = ChildIndividual(deepcopy(mother.neural_network))
         child_2 = ChildIndividual(deepcopy(father.neural_network))
@@ -213,8 +225,8 @@ class Individual:
         return child_1, child_2
 
 
-Individual.available_reproductions = [
-    Individual.weight_swap_reproduction,
-    Individual.neuron_swap_reproduction,
-    Individual.layer_swap_reproduction,
+AdultIndividual.available_reproductions = [
+    AdultIndividual.weight_swap_reproduction,
+    AdultIndividual.neuron_swap_reproduction,
+    AdultIndividual.layer_swap_reproduction,
 ]

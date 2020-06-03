@@ -4,7 +4,7 @@ import numpy as np
 
 from model.environment.environment import Environment
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
-from model.neuroevolution.individual import Individual, ChildIndividual
+from model.neuroevolution.individual import AdultIndividual, ChildIndividual
 
 
 class Neuroevolution:
@@ -24,7 +24,7 @@ class Neuroevolution:
 
     @staticmethod
     def _reproduction_probability(
-        individual: Individual, bound_adaptation: float
+        individual: AdultIndividual, bound_adaptation: float
     ) -> float:
         """
         Probability of reproduction for every given individual
@@ -64,8 +64,8 @@ class Neuroevolution:
         # TODO move environment somewhere else
         self._environment: Environment = environment
         self._new_generation: List[ChildIndividual] = networks
-        self.individuals: List[Individual] = []
-        self._parents: List[Individual] = []
+        self.individuals: List[AdultIndividual] = []
+        self._parents: List[AdultIndividual] = []
 
     @classmethod
     def init_with_neural_network_info(
@@ -88,37 +88,30 @@ class Neuroevolution:
         )
         self.individuals = self.individuals[: self._INDIVIDUALS]
 
-    def _selection(self) -> List[Individual]:
+    def _selection(self) -> List[AdultIndividual]:
         bound_adaptation = self.individuals[self._GOLDEN_TICKETS].adaptation
-        if bound_adaptation is None:
-            # this should never happen
-            raise Exception("Bound adaptation cannot be undefined")
         parents = self.individuals[: self._GOLDEN_TICKETS]
-        # i would prefer to commit this line
-        # for individual in self.individuals[self._GOLDEN_TICKETS : self._INDIVIDUALS]:
-        # but pre-commit sucks :<
-        for i in range(self._GOLDEN_TICKETS, self._INDIVIDUALS):
+        for individual in self.individuals[self._GOLDEN_TICKETS : self._INDIVIDUALS]:
             if np.random.rand() < self._reproduction_probability(
-                self.individuals[i], bound_adaptation
+                individual, bound_adaptation
             ):
-                parents.append(self.individuals[i])
+                parents.append(individual)
         return parents
 
-    def _reproduction(self, parents: List[Individual]) -> List[ChildIndividual]:
-        children_remain = self._INDIVIDUALS - len(parents)
+    def _reproduction(self, parents: List[AdultIndividual]) -> List[ChildIndividual]:
+        children_to_make = self._INDIVIDUALS - len(parents)
         children: List[ChildIndividual] = []
-        while children_remain > 0:
+        while len(children) < children_to_make:
             mother, father = np.random.choice(parents, size=2)
             while mother == father:
                 father = np.random.choice(parents)
             daughter, son = np.random.choice(
-                Individual.available_reproductions, p=self._REPRODUCTION_PROBABILITIES
+                AdultIndividual.available_reproductions,
+                p=self._REPRODUCTION_PROBABILITIES,
             )(mother, father)
             children.append(daughter)
-            children_remain -= 1
-            if children_remain > 0:
+            if len(children) < children_to_make:
                 children.append(son)
-                children_remain -= 1
         return children
 
     def _mutation(self, individuals: List[ChildIndividual]) -> List[ChildIndividual]:
@@ -130,14 +123,23 @@ class Neuroevolution:
         return individuals
 
     def evolve(self, with_parents: bool) -> None:
+        """
+        Evaluates individuals from current generation and
+        produce new generation out of the best.
+
+        Args:
+            with_parents (bool): Indicates whether parents of current generation
+                should take part in race.
+        """
         adaptations = self._environment.compute_adaptations(
             (child.neural_network for child in self._new_generation),
-            (parent.neural_network for parent in self.individuals)
-            if with_parents
-            else [],
+            (
+                parent.neural_network
+                for parent in (self._parents if with_parents else [])
+            ),
         )
         new_individuals = [
-            Individual(child.neural_network, adaptation)
+            AdultIndividual(child.neural_network, adaptation)
             for child, adaptation in zip(self._new_generation, adaptations)
         ]
         self.individuals.extend(new_individuals)
