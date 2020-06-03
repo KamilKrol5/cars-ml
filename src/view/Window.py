@@ -1,6 +1,7 @@
 from typing import Tuple, Any, Optional, Union, Dict
 
 import pygame
+from pygame.surface import Surface
 
 from view import Colors
 from view.Action import ActionType
@@ -8,17 +9,20 @@ from view.View import View
 
 
 class Window:
+    loading_screen: Union[View, Surface, None] = None
+
     def __init__(
-        self,
-        name: str,
-        size: Tuple[int, int],
-        mode: Any = None,
-        fullscreen: bool = False,
-        resizable: bool = False,
+            self,
+            name: str,
+            size: Tuple[int, int],
+            mode: Any = None,
+            fullscreen: bool = False,
+            resizable: bool = False,
     ):
         pygame.init()
         pygame.display.set_caption(name)
-        self._screen: pygame.Surface = pygame.display.set_mode(size)  # TODO modes
+        self._screen: pygame.Surface = pygame.display.set_mode(
+            size)  # TODO modes
         self._closing = False
         self._view_manager = self.ViewManager()
 
@@ -34,11 +38,8 @@ class Window:
 
             self._screen.fill(Colors.BLACK)
 
-            if (
-                x := self._view_manager.active_view.draw(
-                    self._screen, event_passthrough
-                )
-            ) is not None:
+            if x := self._view_manager.active_view.draw(self._screen,
+                                                        event_passthrough):
                 if x.type == ActionType.SYS_EXIT:
                     self._closing = True
                 elif x.type == ActionType.CHANGE_VIEW:
@@ -76,7 +77,8 @@ class Window:
                 raise AssertionError("No activated views found")
             return self._views[self._active]
 
-    def add_view(self, view: View, id: Union[int, str], active: bool = False) -> None:
+    def add_view(self, view: View, id: Union[int, str],
+                 active: bool = False) -> None:
         self._view_manager.add(view, id, active)
 
     def remove_view(self, id: Union[int, str]) -> View:

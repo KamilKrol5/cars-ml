@@ -29,6 +29,7 @@ class Menu(View):
         self.divider = 0.4
 
     def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+        # TODO add activation check for consistency
         size = destination.get_size()
         self._update_geometry(size)
 

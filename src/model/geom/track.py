@@ -50,3 +50,9 @@ class Track:
                 if (d := sensor.check_distance(wall)) is not None:
                     return d
         raise RuntimeError("couldn't find any walls in any of the segments")
+
+    @property
+    def boundaries(self) -> Tuple[Tuple[int,int],Tuple[int, int]]:
+        """:return (x0, x1), (y0, y1)
+        x0<x1, y0<y1"""
+        raise NotImplementedError
