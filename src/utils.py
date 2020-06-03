@@ -1,6 +1,7 @@
-from typing import Iterable, Tuple, TypeVar
 import itertools
+from typing import Iterable, Tuple, TypeVar, MutableSequence, Any, Union
 
+import numpy as np
 
 T = TypeVar("T")
 
@@ -26,3 +27,18 @@ def spread_int(a: int, min_bound: int, max_bound: int) -> Iterable[int]:
             yield x
             done = False
         diff += 1
+
+
+def swap_same_index(
+    seq1: MutableSequence[Any], seq2: MutableSequence[Any], index: int,
+) -> None:
+    seq1[index], seq2[index] = seq2[index], seq1[index]
+
+
+def swap_numpy_same_index(
+    array1: np.ndarray, array2: np.ndarray, swap_index: Union[int, Tuple[int, ...]],
+) -> None:
+    array1[swap_index], array2[swap_index] = (
+        array2[swap_index],
+        array1[swap_index].copy(),
+    )

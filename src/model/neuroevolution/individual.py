@@ -5,6 +5,7 @@ from typing import Tuple, ClassVar, List, Callable, cast
 import numpy as np
 
 from model.neural_network.neural_network import NeuralNetwork, Layer
+from utils import swap_same_index, swap_numpy_same_index
 
 
 @dataclass
@@ -153,12 +154,8 @@ class AdultIndividual:
                 random_layer_index
             ]
             weight_index = ChildIndividual.get_random_weight_index(child_1_rand_layer)
-            (
-                child_1_rand_layer.weights[weight_index],
-                child_2_rand_layer.weights[weight_index],
-            ) = (
-                child_2_rand_layer.weights[weight_index],
-                child_1_rand_layer.weights[weight_index],
+            swap_numpy_same_index(
+                child_1_rand_layer.weights, child_2_rand_layer.weights, weight_index
             )
         return child_1, child_2
 
@@ -189,9 +186,8 @@ class AdultIndividual:
                 random_layer_index
             ].weights
             neuron_index = np.random.randint(0, child_2_rand_layer_w.shape[0])
-            child_1_rand_layer_w[neuron_index], child_2_rand_layer_w[neuron_index] = (
-                child_2_rand_layer_w[neuron_index],
-                child_1_rand_layer_w[neuron_index].copy(),
+            swap_numpy_same_index(
+                child_1_rand_layer_w, child_2_rand_layer_w, neuron_index
             )
         return child_1, child_2
 
@@ -218,10 +214,7 @@ class AdultIndividual:
             layer_index = child_1.get_random_layer_index()
             child_1_rand_layers = child_1.neural_network.hidden_layers
             child_2_rand_layers = child_2.neural_network.hidden_layers
-            child_2_rand_layers[layer_index], child_1_rand_layers[layer_index] = (
-                child_1_rand_layers[layer_index],
-                child_2_rand_layers[layer_index],
-            )
+            swap_same_index(child_1_rand_layers, child_2_rand_layers, layer_index)
         return child_1, child_2
 
 
