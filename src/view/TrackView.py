@@ -54,8 +54,8 @@ class TrackView(View):
 
         # may be optimised
         if (
-            destination.get_width() > self.board.get_width()
-            or destination.get_width() > self.board.get_width()
+            destination.get_width() > board.get_width()
+            or destination.get_height() > board.get_height()
         ):
             board = self.board
             new_size = (
