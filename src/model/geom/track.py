@@ -49,7 +49,8 @@ class Track:
         self, sensors: List[Sensor], active_segment: SegmentId
     ) -> List[float]:
         """Returns the distance to the closest wall of the track sensed with the given sensor."""
-        # TODO: edge cases when a later segment has the closest wall
+        # TODO?: edge cases when a later segment has
+        #  the closest wall (not sure if that ever happens)
         sensors_to_check: List[Tuple[int, Sensor]] = list(enumerate(sensors))
         distances: List[Optional[float]] = [None] * len(sensors_to_check)
         for segment_id in self._spread_segment_ids(active_segment):

@@ -1,4 +1,4 @@
-from typing import Tuple, List, ClassVar
+from typing import Tuple, List
 
 import numpy as np
 
@@ -13,13 +13,11 @@ class Collision(Exception):
 
 
 class Car:
-    TRACTION: ClassVar[float] = 1.0
-    _ACCELERATION_RATE: float = 10
-    _BRAKING_RATE: float = 10  # braking means "accelerate backwards" also
-    _MAX_FORWARD_VELOCITY: float = 200
-    _MAX_BACKWARD_VELOCITY: float = 50
-    _ROTATION_RATE: float = 1
-    _SIZE: float = 10
+    _TRACTION: float = 1.0
+    _ACCELERATION_RATE: float = 10.0
+    _BRAKING_RATE: float = 5.0
+    _MAX_FORWARD_SPEED: float = 200.0
+    _MAX_BACKWARD_SPEED: float = 50.0
 
     __slots__ = ("rect", "sensors", "neural_network", "speed", "active_segment")
 
@@ -44,8 +42,9 @@ class Car:
 
     def _move(self, turning_rate: float, delta_time: float, track: Track) -> None:
         transform = self.rect.turn_curve_transform(
-            self.speed, Car.TRACTION, turning_rate, delta_time
+            self.speed, Car._TRACTION, turning_rate, delta_time
         )
+
         for sensor in self.sensors:
             sensor.transform(transform)
         self.rect.transform(transform)
@@ -53,8 +52,30 @@ class Car:
         self.active_segment = track.update_active(self.active_segment, self.rect.center)
 
     def _update_speed(self, acceleration: float, delta_time: float) -> None:
-        # TODO: limit speed
-        self.speed += acceleration * delta_time
+        speed_dir: float = np.sign(self.speed)
+        acceleration_dir: float = np.sign(acceleration)
+        speed_limits = {
+            1.0: (0.0, Car._MAX_FORWARD_SPEED),
+            -1.0: (-Car._MAX_BACKWARD_SPEED, 0.0),
+        }
+        speed_limit = speed_limits.get(
+            speed_dir, speed_limits.get(acceleration_dir, (0.0, 0.0))
+        )
+
+        if acceleration_dir == speed_dir or speed_dir == 0.0:
+            # car accelerates with the same rate forward and backward
+            rate = Car._ACCELERATION_RATE
+        else:
+            rate = Car._BRAKING_RATE
+
+        scaled_acceleration = rate * acceleration
+        new_speed = self.speed + scaled_acceleration * delta_time
+        new_speed_clipped = np.clip(new_speed, *speed_limit)
+        self.speed = new_speed_clipped
+        if new_speed_clipped != new_speed and new_speed_clipped == 0.0:
+            remaining_speed = new_speed - new_speed_clipped
+            remaining_time = remaining_speed / scaled_acceleration
+            self._update_speed(acceleration, remaining_time)
 
     def tick(self, track: Track, delta_time: float) -> None:
         distances = self._sense_surroundings(track)
