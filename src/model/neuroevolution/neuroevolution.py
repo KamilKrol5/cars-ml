@@ -131,19 +131,15 @@ class Neuroevolution:
             with_parents (bool): Indicates whether parents of current generation
                 should take part in race.
         """
+        network_groups = {
+            "children": (child.neural_network for child in self._new_generation)
+        }
         if with_parents:
-            adaptations = self._environment.compute_adaptations(
-                {
-                    "children": (
-                        child.neural_network for child in self._new_generation
-                    ),
-                    "parents": (parent.neural_network for parent in self._parents),
-                }
+            network_groups["parents"] = (
+                parent.neural_network for parent in self._parents
             )
-        else:
-            adaptations = self._environment.compute_adaptations(
-                {"children": (child.neural_network for child in self._new_generation)}
-            )
+
+        adaptations = self._environment.compute_adaptations(network_groups)
 
         new_individuals = [
             AdultIndividual(child.neural_network, adaptation)
