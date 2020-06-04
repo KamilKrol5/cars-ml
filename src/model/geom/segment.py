@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import cast
 
 from planar import Polygon, Vec2
+from planar.box import BoundingBox
 from planar.line import LineSegment
 
 from model.geom.wall import Wall
@@ -35,6 +36,10 @@ class TrackSegment:
         )
 
     @cached_property
+    def bounding_box(self) -> BoundingBox:
+        return self.region.bounding_box
+
+    @cached_property
     def back_wall(self) -> Wall:
         return Wall(
             LineSegment.from_points(
@@ -51,11 +56,11 @@ class TrackSegment:
         )
 
     def is_point_inside(self, center: Vec2) -> bool:
-        """Check whether the given point is inside this segment."""
+        """Checks whether the given point is inside this segment."""
         region = self.region
         return cast(bool, region.contains_point(center))
 
     def is_fully_inside(self, shape: Polygon) -> bool:
-        """Check whether the given polygon is fully contained in this segment."""
+        """Checks whether the given polygon is fully contained in this segment."""
         region = self.region
         return all(region.contains_point(p) for p in shape)

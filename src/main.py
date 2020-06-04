@@ -20,18 +20,19 @@ def main_no_ui() -> None:
     neural_network = NeuralNetwork()
     sensor = Sensor(Ray((0, 0), (0, 1)))  # TODO: move construction elsewhere
 
-    car = Car((10, 20), [sensor], neural_network)
+    car = Car((1, 2), [sensor], neural_network)
 
     track = Track.from_points(
         [
-            (Point(-1.0, -1.0), Point(-1.0, 1.0)),
-            (Point(1.0, -1.0), Point(1.0, 1.0)),
-            (Point(2.0, -1.0), Point(2.0, 1.0)),
+            (Point(-10.0, -10.0), Point(-10.0, 10.0)),
+            (Point(10.0, -10.0), Point(10.0, 10.0)),
+            (Point(20.0, -10.0), Point(20.0, 10.0)),
         ]
     )
+    sleep_time = 0.1
     while True:
-        sleep(1)
-        car.tick(track, 1.0)
+        sleep(sleep_time)
+        car.tick(track, sleep_time)
         car.go_brrrr()
 
 
