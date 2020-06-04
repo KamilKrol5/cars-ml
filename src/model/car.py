@@ -37,9 +37,7 @@ class Car:
         self.active_segment: SegmentId = 0
 
     def _sense_surroundings(self, track: Track) -> List[float]:
-        return [
-            track.sense_closest(sensor, self.active_segment) for sensor in self.sensors
-        ]
+        return track.sense_closest(self.sensors, self.active_segment)
 
     def _check_collision(self, track: Track) -> bool:
         return track.intersects(self.rect.shape, self.active_segment)

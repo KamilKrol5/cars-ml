@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Iterable
+from typing import List, Tuple, Iterable, Optional, cast
 
 from planar import Point
 from planar.line import LineSegment
@@ -45,15 +45,24 @@ class Track:
     def _spread_segment_ids(self, segment_id: SegmentId) -> Iterable[SegmentId]:
         return utils.spread_int(segment_id, 0, len(self.segments))
 
-    def sense_closest(self, sensor: Sensor, active_segment: SegmentId) -> float:
+    def sense_closest(
+        self, sensors: List[Sensor], active_segment: SegmentId
+    ) -> List[float]:
         """Returns the distance to the closest wall of the track sensed with the given sensor."""
         # TODO: edge cases when a later segment has the closest wall
-        # TODO: optimize for multiple sensors
+        sensors_to_check: List[Tuple[int, Sensor]] = list(enumerate(sensors))
+        distances: List[Optional[float]] = [None] * len(sensors_to_check)
         for segment_id in self._spread_segment_ids(active_segment):
             for wall in self.segment_walls(segment_id):
-                if (d := sensor.check_distance(wall)) is not None:
-                    return d
-        raise RuntimeError("couldn't find any walls in any of the segments")
+                for i, sensor in sensors_to_check[:]:
+                    if (d := sensor.check_distance(wall)) is not None:
+                        distances[i] = d
+                        del sensors_to_check[i]
+
+        if any(d is None for d in distances):
+            raise RuntimeError("couldn't find any walls in any of the segments")
+
+        return cast(List[float], distances)
 
     def intersects(self, shape: Polygon, active_segment: SegmentId) -> bool:
         """Checks whether a given shape intersects any of the track's walls."""
