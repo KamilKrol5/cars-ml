@@ -48,20 +48,27 @@ class Track:
     def sense_closest(
         self, sensors: List[Sensor], active_segment: SegmentId
     ) -> List[float]:
-        """Returns the distance to the closest wall of the track sensed with the given sensor."""
+        """Returns the distances to the closest walls of the track sensed with the given sensors."""
         # TODO?: edge cases when a later segment has
         #  the closest wall (not sure if that ever happens)
+
         sensors_to_check: List[Tuple[int, Sensor]] = list(enumerate(sensors))
         distances: List[Optional[float]] = [None] * len(sensors_to_check)
         for segment_id in self._spread_segment_ids(active_segment):
             for wall in self.segment_walls(segment_id):
-                for i, sensor in sensors_to_check[:]:
+                for i in reversed(range(len(sensors_to_check))):
+                    dist_index, sensor = sensors_to_check[i]
                     if (d := sensor.check_distance(wall)) is not None:
-                        distances[i] = d
+                        distances[dist_index] = d
+                        # while iterating backward removing elements won't affect the order
                         del sensors_to_check[i]
+            if not sensors_to_check:
+                break
 
-        if any(d is None for d in distances):
-            raise RuntimeError("couldn't find any walls in any of the segments")
+        if sensors_to_check:
+            raise RuntimeError(
+                "one of the sensors couldn't find any walls in any of the segments"
+            )
 
         return cast(List[float], distances)
 
@@ -82,7 +89,8 @@ class Track:
         return False
 
     def update_active(self, active_segment: SegmentId, center: Point) -> SegmentId:
-        """Returns segment currently containing the given point
+        """
+        Returns segment currently containing the given point
         assuming it was moved by a small amount and is still inside the track.
         """
         for segment_id in self._spread_segment_ids(active_segment):
