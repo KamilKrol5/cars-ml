@@ -3,8 +3,8 @@ from typing import List, Optional, Any, Dict
 from pygame.event import EventType
 from pygame.surface import Surface
 
-from view.Action import Action
-from view.View import View
+from view.action import Action
+from view.view import View
 
 
 class OptionsMenu(View):

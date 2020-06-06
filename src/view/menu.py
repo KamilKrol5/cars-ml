@@ -6,9 +6,9 @@ from pygame.event import EventType
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from view import Colors
-from view.Action import Action
-from view.View import View
+from view import colors
+from view.action import Action
+from view.view import View
 
 
 class Menu(View):
@@ -18,9 +18,9 @@ class Menu(View):
         self.font = pygame.font.SysFont("Verdana", 24)
         self.selected_item = 0
         self._options = OrderedDict(menu_options)
-        self.font_color = Colors.WHITE
-        self.button_highlight = Colors.GRAY
-        self.button_color = Colors.LIGHTGRAY
+        self.font_color = colors.WHITE
+        self.button_highlight = colors.GRAY
+        self.button_color = colors.LIGHTGRAY
         self._background: Optional[Tuple[Surface, Tuple[int, int]]] = None
         self._logo: Optional[Tuple[Surface, Tuple[int, int]]] = None
         self.background_image: Surface = Surface((1, 1))

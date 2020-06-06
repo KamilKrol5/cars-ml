@@ -3,8 +3,8 @@ from typing import Tuple, Optional, Union, Dict
 import pygame
 from pygame.surface import Surface
 
-from view.Action import ActionType
-from view.View import View
+from view.action import ActionType
+from view.view import View
 
 
 class Window:

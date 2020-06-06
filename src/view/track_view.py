@@ -10,9 +10,9 @@ from pygame.surface import Surface
 
 from model.Simulation import Simulation
 from model.geom.track import Track
-from view import Colors
-from view.Action import Action, ActionType
-from view.View import View
+from view import colors
+from view.action import Action, ActionType
+from view.view import View
 
 
 class TrackView(View):
@@ -24,9 +24,9 @@ class TrackView(View):
     scale = 1.0
     poi = Vec2(0, 0)
     # margin = 0
-    background_color = Colors.GRAY
-    foreground_color = Colors.BLACK
-    car_color = Colors.RED
+    background_color = colors.GRAY
+    foreground_color = colors.BLACK
+    car_color = colors.RED
 
     def __init__(self, simulation: Optional[Simulation]):
         super().__init__()
@@ -99,8 +99,8 @@ class TrackView(View):
         # board_start = track.boundaries[0] * self.scale
         board_surf = Surface(board_size)
         # board_rect = Rect(board_start, board_size)
-        board_surf.fill(Colors.BIZARRE_MASKING_PURPLE)
-        board_surf.set_colorkey(Colors.BIZARRE_MASKING_PURPLE, pygame.RLEACCEL)
+        board_surf.fill(colors.BIZARRE_MASKING_PURPLE)
+        board_surf.set_colorkey(colors.BIZARRE_MASKING_PURPLE, pygame.RLEACCEL)
 
         for segment in track.segments:
             points: Iterable[Vec2] = segment.region

@@ -4,7 +4,7 @@ from typing import List, Optional
 from pygame.event import EventType
 from pygame.surface import Surface
 
-from view.Action import Action
+from view.action import Action
 
 
 class View(ABC):

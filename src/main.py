@@ -10,10 +10,10 @@ from model.car import Car
 from model.geom.sensor import Sensor
 from model.geom.track import Track
 from model.neural_network_old import NeuralNetwork
-from view.Action import Action, ActionType
-from view.Menu import Menu
-from view.TrackView import TrackView
-from view.Window import Window
+from view.action import Action, ActionType
+from view.menu import Menu
+from view.track_view import TrackView
+from view.window import Window
 
 WINDOW_NAME = "CarsML"
 WINDOW_SIZE = (1280, 800)
