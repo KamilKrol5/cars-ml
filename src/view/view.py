@@ -15,7 +15,7 @@ class View(ABC):
         self._active = True
 
     @abstractmethod
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(self, surface: Surface, events: List[EventType]) -> Optional[Action]:
         pass
 
     def deactivate(self) -> None:

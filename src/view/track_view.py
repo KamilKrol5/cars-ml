@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-from typing import List, Optional, Type, Dict, Any, Iterable
+from typing import List, Optional, Type, Dict, Any, Iterable, Tuple
 
 import pygame
-from planar import Vec2
+from planar import Vec2, Point
 from pygame.event import EventType
 from pygame.rect import Rect
 from pygame.surface import Surface
 
 from model.geom.track import Track
-from model.simulation import Simulation
 from model.neuroevolution.neuroevolution import Neuroevolution
+from model.simulation import Simulation
 from view import colors
 from view.action import Action, ActionType
+from view.pygame_environment import EnvironmentContext
 from view.view import View
 
 
@@ -29,24 +30,14 @@ class TrackView(View):
     foreground_color = colors.BLACK
     car_color = colors.RED
 
-    def __init__(self, simulation: Optional[Simulation]):
+    def __init__(self, track_data: List[Tuple[Point, Point]]) -> None:
         super().__init__()
-        # to make non optional, as it really is, builder would be required
-        self.simulation = simulation
-
-    @classmethod
-    def from_dataset(
-        cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
-    ) -> TrackView:
-        track_view = cls(None)
-        track_view.simulation_class = simulation_class
-        track_view.dataset = dataset
-        return track_view
+        self.track_data = track_data
 
     neuroevolution = Neuroevolution(None)
     evo = neuroevolution.generate_evolution(None, False)
 
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(self, surface: Surface, events: List[EventType]) -> Optional[Action]:
         if (x := self._process_events(events)) is not None:
             return x
 
@@ -57,8 +48,8 @@ class TrackView(View):
         # to be refactored
         board = self.board.copy()
         new_size = (
-            max(board.get_width(), destination.get_width()),
-            max(board.get_height(), destination.get_height()),
+            max(board.get_width(), surface.get_width()),
+            max(board.get_height(), surface.get_height()),
         )
         anchor = Vec2(*new_size)
         anchor -= board.get_size()
@@ -69,13 +60,13 @@ class TrackView(View):
         board = new_board
 
         try:
-            self.evo.send(destination)
-        except StopIteration as si:
+            self.evo.send(EnvironmentContext(surface, 1.0 / 60.0))
+        except StopIteration:
             self.evo = self.neuroevolution.generate_evolution(None, False)
 
-        view_rect: Rect = destination.get_rect()
-        limit_x = destination.get_width() // 2
-        limit_y = destination.get_height() // 2
+        view_rect: Rect = surface.get_rect()
+        limit_x = surface.get_width() // 2
+        limit_y = surface.get_height() // 2
         center_x = min(
             max(limit_x, self.point_of_interest.x), board.get_width() - limit_x
         )
@@ -84,7 +75,7 @@ class TrackView(View):
         )
         view_rect.center = (int(center_x), int(center_y))
 
-        destination.blit(board.subsurface(view_rect), (0, 0))
+        surface.blit(board.subsurface(view_rect), (0, 0))
 
         return None
 
@@ -122,7 +113,7 @@ class TrackView(View):
         for event in events:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
-                    return Action(ActionType.CHANGE_VIEW, 0)
+                    return Action(ActionType.POP_VIEW, 0)
                 elif event.key == pygame.K_KP_PLUS:
                     self.scale *= 1.6
                     self.point_of_interest *= 1.6

@@ -13,5 +13,5 @@ class OptionsMenu(View):
     ) -> None:
         super().__init__()
 
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(self, surface: Surface, events: List[EventType]) -> Optional[Action]:
         pass

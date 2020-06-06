@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Union
+from typing import Any, Optional
 
 
 class ActionType(Enum):
     CONTINUE = auto()  # Unused
     SYS_EXIT = auto()
-    CHANGE_VIEW = auto()
-    BACK_VIEW = auto()
+    PUSH_VIEW = auto()
+    POP_VIEW = auto()
 
 
 @dataclass
 class Action:
     type: ActionType
-    extra: Union[str, int, None] = None
+    extra: Optional[Any] = None

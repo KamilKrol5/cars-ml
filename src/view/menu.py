@@ -28,18 +28,18 @@ class Menu(View):
         self.button_dims = (360, 80)
         self.divider = 0.4
 
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(self, surface: Surface, events: List[EventType]) -> Optional[Action]:
         # TODO add activation check for consistency
-        size = destination.get_size()
+        size = surface.get_size()
         self._update_geometry(size)
 
         if self._process_events(events):
             return list(self._options.values())[self.selected_item]
 
         if self._background:
-            destination.blit(*self._background)
+            surface.blit(*self._background)
         if self._logo:
-            destination.blit(*self._logo)
+            surface.blit(*self._logo)
 
         for pos, button in enumerate(self._options):
             ofset_y = int(pos * 1.5 * self.button_dims[1])
@@ -49,9 +49,9 @@ class Menu(View):
                 if pos == self.selected_item
                 else self.button_color
             )
-            pygame.draw.rect(destination, color, shifted_button_rect)
+            pygame.draw.rect(surface, color, shifted_button_rect)
             label = self.font.render(button, True, self.font_color)
-            destination.blit(
+            surface.blit(
                 label,
                 (
                     shifted_button_rect.centerx - (label.get_width() // 2),

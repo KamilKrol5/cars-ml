@@ -1,9 +1,9 @@
-from typing import Tuple, Optional, Union, Dict
+from typing import Tuple, Optional, Union, Callable, List, NoReturn, Mapping
 
 import pygame
 from pygame.surface import Surface
 
-from view.action import ActionType
+from view.action import ActionType, Action
 from view.view import View
 
 
@@ -30,7 +30,8 @@ class Window:
         self._view_manager = self.ViewManager()
         self._min_size = min_size
 
-    def run(self) -> None:
+    def run(self, initial_view: View) -> None:
+        self._view_manager.push(initial_view)
 
         while not self._closing:
             event_passthrough = []
@@ -53,49 +54,65 @@ class Window:
                     event_passthrough.append(event)
 
             if (
-                x := self._view_manager.active_view.draw(
+                action := self._view_manager.active_view.draw(
                     self._screen, event_passthrough
                 )
             ) is not None:
-                if x.type == ActionType.SYS_EXIT:
-                    self._closing = True
-                elif x.type == ActionType.CHANGE_VIEW:
-                    assert x.extra is not None
-                    print(x)
-                    self._view_manager.change_view(x.extra)
-                else:
-                    raise NotImplementedError
+                self._execute_action(action)
 
             pygame.display.update()
         pygame.quit()
 
+    def _execute_action(self, action: Action) -> None:
+        actions: Mapping[ActionType, Callable[[Action], None]]
+        actions = {
+            ActionType.SYS_EXIT: self._exit,
+            ActionType.PUSH_VIEW: self._push_view,
+            ActionType.POP_VIEW: self._pop_view,
+        }
+        actions.get(action.type, self.__invalid_action)(action)
+
+    def _push_view(self, action: Action) -> None:
+        assert action.extra is not None, "empty action data"
+        print(action)
+        view_constructor, *args = action.extra
+        new_view = view_constructor(*args)
+        self._view_manager.push(new_view)
+
+    def _pop_view(self, _: Action) -> None:
+        self._view_manager.pop()
+
+    def _exit(self, _: Action) -> None:
+        self._closing = True
+
+    def __invalid_action(self, _: Action) -> NoReturn:
+        raise NotImplementedError
+
     class ViewManager:
         def __init__(self) -> None:
-            self._active: Optional[Union[int, str]] = None
-            self._views: Dict[Union[int, str], View] = {}
+            self._views: List[View] = []
 
-        def remove(self, id: Union[int, str]) -> View:
-            return self._views.pop(id)
+        def push(self, view: View) -> None:
+            if (active := self._active_view) is not None:
+                active.deactivate()
+            self._views.append(view)
+            view.activate()
 
-        def add(self, view: View, id: Union[int, str], active: bool) -> None:
-            self._views[id] = view
-            if active:
-                self.change_view(id)
+        def pop(self) -> View:
+            assert self._views, "no views found"
+            view = self._views.pop()
+            view.deactivate()
+            return view
 
-        def change_view(self, id: Union[int, str]) -> None:
-            if self._active is not None:
-                self._views[self._active].deactivate()
-            self._active = id
-            self._views[id].activate()
+        @property
+        def _active_view(self) -> Optional[View]:
+            if self._views:
+                return self._views[-1]
+            else:
+                return None
 
         @property
         def active_view(self) -> View:
-            if self._active is None:
-                raise AssertionError("No activated views found")
-            return self._views[self._active]
-
-    def add_view(self, view: View, id: Union[int, str], active: bool = False) -> None:
-        self._view_manager.add(view, id, active)
-
-    def remove_view(self, id: Union[int, str]) -> View:
-        return self._view_manager.remove(id)
+            view = self._active_view
+            assert view is not None, "no views found"
+            return view

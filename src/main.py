@@ -8,7 +8,6 @@ from model.car import Car
 from model.geom.sensor import Sensor
 from model.geom.track import Track
 from model.neural_network_old import NeuralNetwork
-from model.simulation import Simulation
 from view.action import Action, ActionType
 from view.menu import Menu
 from view.track_view import TrackView
@@ -51,27 +50,15 @@ def main() -> None:
     window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_MIN_SIZE)
 
     menu_options = {
-        "Train": Action(ActionType.CHANGE_VIEW, 1),
-        "Play": Action(ActionType.CHANGE_VIEW, 2),
+        "Train": Action(ActionType.PUSH_VIEW, (TrackView, tracks[0]["points"])),
+        "Play": Action(ActionType.PUSH_VIEW, (TrackView, tracks[1]["points"])),
         "Exit": Action(ActionType.SYS_EXIT),
     }
     menu = Menu(menu_options)
     menu.background_image = pygame.image.load("resources/graphics/menu-background.png")
     menu.logo_image = pygame.image.load("resources/graphics/logo.png")
 
-    track = Track.from_points(tracks[0]["points"])
-    sim = Simulation(track)
-    tv = TrackView(sim)
-
-    track1 = Track.from_points(tracks[1]["points"])
-    sim1 = Simulation(track1)
-    tv1 = TrackView(sim1)
-
-    window.add_view(menu, 0, True)
-    window.add_view(tv, 1)
-    window.add_view(tv1, 2)
-
-    window.run()
+    window.run(menu)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,14 @@
 import itertools
-from typing import Iterable, Tuple, TypeVar, MutableSequence, Union, Any, Generator
+from typing import (
+    Iterable,
+    Tuple,
+    TypeVar,
+    MutableSequence,
+    Union,
+    Any,
+    Generator,
+    cast,
+)
 
 import numpy as np
 
@@ -49,4 +58,4 @@ def generator_value(gen: Generator[Any, None, T]) -> T:
         while True:
             next(gen)
     except StopIteration as si:
-        return si.value
+        return cast(T, si.value)

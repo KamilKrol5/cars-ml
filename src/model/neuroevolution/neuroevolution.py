@@ -131,12 +131,12 @@ class Neuroevolution:
                 should take part in race.
         """
         network_groups = {
-            "children": (child.neural_network for child in self._new_generation)
+            "children": [child.neural_network for child in self._new_generation]
         }
         if with_parents:
-            network_groups["parents"] = (
+            network_groups["parents"] = [
                 parent.neural_network for parent in self._parents
-            )
+            ]
 
         adaptations = yield from environment.generate_adaptations(network_groups)
 
