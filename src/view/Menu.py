@@ -23,7 +23,7 @@ class Menu(View):
         self.button_color = Colors.LIGHTGRAY
         self._background: Optional[Tuple[Surface, Tuple[int, int]]] = None
         self._logo: Optional[Tuple[Surface, Tuple[int, int]]] = None
-        self.background_image: Optional[Surface] = None
+        self.background_image: Surface = Surface((1, 1))
         self.logo_image: Optional[Surface] = None
         self.button_dims = (360, 80)
         self.divider = 0.4

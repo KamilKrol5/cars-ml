@@ -16,7 +16,7 @@ from view.TrackView import TrackView
 from view.Window import Window
 
 WINDOW_NAME = "CarsML"
-WINDOW_SIZE = (800, 800)
+WINDOW_SIZE = (1280, 800)
 
 
 def main_no_ui() -> None:
@@ -43,12 +43,12 @@ def main_no_ui() -> None:
 def main() -> None:
     tracks = {}
     try:
-        with open("../resources/tracks.json") as file:
+        with open("resources/tracks.json") as file:
             tracks = json.load(file)["tracks"]
     except (IOError, IndexError):
         raise IOError("Unable to load tracks from file")
 
-    window = Window(WINDOW_NAME, WINDOW_SIZE)
+    window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_SIZE)
 
     menu_options = {
         "Train": Action(ActionType.CHANGE_VIEW, 1),
@@ -56,10 +56,8 @@ def main() -> None:
         "Exit": Action(ActionType.SYS_EXIT),
     }
     menu = Menu(menu_options)
-    menu.background_image = pygame.image.load(
-        "../resources/graphics/menu-background.png"
-    )
-    menu.logo_image = pygame.image.load("../resources/graphics/logo.png")
+    menu.background_image = pygame.image.load("resources/graphics/menu-background.png")
+    menu.logo_image = pygame.image.load("resources/graphics/logo.png")
 
     track = Track.from_points(tracks[0]["points"])
     sim = Simulation(track)

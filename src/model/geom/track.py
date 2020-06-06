@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import List, Tuple, Iterable, Optional, cast
 
-from planar import Point, Vec2
+from planar import BoundingBox, Point
 from planar.line import LineSegment
 from planar.polygon import Polygon
 
@@ -11,7 +11,6 @@ from model.geom.segment import TrackSegment
 from model.geom.sensor import Sensor
 from model.geom.wall import Wall
 from utils import pairwise
-
 
 SegmentId = int
 
@@ -101,21 +100,5 @@ class Track:
         raise RuntimeError("none of the track's segments contain the given point")
 
     @cached_property
-    def boundaries(self) -> Tuple[Vec2, Vec2]:
-        """:return: Tuple[Vec2, Vec2] - upper left and lower right corners of rectangle enclosing track
-        """
-        first_point = self.segments[0].right_wall.line_segment.points[0]
-        min_x = first_point.x
-        min_y = first_point.y
-        max_x = first_point.x
-        max_y = first_point.y
-        for segment in self.segments:
-            for point in (
-                segment.left_wall.line_segment.points
-                + segment.right_wall.line_segment.points
-            ):
-                min_x = min(min_x, point.x)
-                min_y = min(min_y, point.y)
-                max_x = max(max_x, point.x)
-                max_y = max(max_y, point.y)
-        return Vec2(min_x, min_y), Vec2(max_x, max_y)
+    def bounding_box(self) -> BoundingBox:
+        return BoundingBox.from_shapes(segment.region for segment in self.segments)

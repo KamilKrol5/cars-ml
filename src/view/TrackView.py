@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Type, Dict, Any
+from typing import List, Optional, Type, Dict, Any, Iterable
 
 import pygame
 from planar import Vec2
@@ -66,7 +66,7 @@ class TrackView(View):
             anchor -= board.get_size()
             anchor /= 2
             new_board = Surface(new_size)
-            new_board.fill(self.background_color)
+            new_board.fill((0, 250, 0))
             new_board.blit(board, Rect(anchor, self.board.get_size()))
             board = new_board
 
@@ -90,18 +90,20 @@ class TrackView(View):
 
     def _prepare_board(self) -> None:
         track: Track = self.simulation.track
-        board_size = (track.boundaries[1] - track.boundaries[0]) * self.scale
-        self.coord_start = track.boundaries[0]
+        board_size = (
+            track.bounding_box.width * self.scale,
+            track.bounding_box.height * self.scale,
+        )
+        self.coord_start = track.bounding_box.min_point
         # board_size += 2 * Vec2(self.margin, self.margin)
         # board_start = track.boundaries[0] * self.scale
         board_surf = Surface(board_size)
         # board_rect = Rect(board_start, board_size)
-        board_surf.fill(self.background_color)  # maybe texture one day
+        board_surf.fill(Colors.BIZARRE_MASKING_PURPLE)
+        board_surf.set_colorkey(Colors.BIZARRE_MASKING_PURPLE, pygame.RLEACCEL)
 
         for segment in track.segments:
-            points: List[Vec2] = []
-            points.extend(segment.left_wall.line_segment.points)
-            points.extend(reversed(segment.right_wall.line_segment.points))
+            points: Iterable[Vec2] = segment.region
             points = [(point - self.coord_start) * self.scale for point in points]
             pygame.draw.polygon(board_surf, self.foreground_color, points)
 
