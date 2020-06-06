@@ -2,14 +2,13 @@ import json
 
 import pygame
 from planar import Point
-
 from planar.line import Ray
 
-from model.Simulation import Simulation
 from model.car import Car
 from model.geom.sensor import Sensor
 from model.geom.track import Track
 from model.neural_network_old import NeuralNetwork
+from model.simulation import Simulation
 from view.action import Action, ActionType
 from view.menu import Menu
 from view.track_view import TrackView
@@ -41,8 +40,8 @@ def main_no_ui() -> None:
         car.tick(track, sleep_time)
         car.go_brrrr()
 
+
 def main() -> None:
-    tracks = {}
     try:
         with open("resources/tracks.json") as file:
             tracks = json.load(file)["tracks"]

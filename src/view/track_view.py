@@ -8,8 +8,8 @@ from pygame.event import EventType
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from model.Simulation import Simulation
 from model.geom.track import Track
+from model.simulation import Simulation
 from view import colors
 from view.action import Action, ActionType
 from view.view import View
@@ -35,7 +35,7 @@ class TrackView(View):
 
     @classmethod
     def from_dataset(
-        cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
+            cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
     ) -> TrackView:
         tv = cls(None)
         tv.simulation_class = simulation_class
@@ -54,8 +54,8 @@ class TrackView(View):
 
         # may be optimised
         if (
-            destination.get_width() > board.get_width()
-            or destination.get_height() > board.get_height()
+                destination.get_width() > board.get_width()
+                or destination.get_height() > board.get_height()
         ):
             board = self.board
             new_size = (
