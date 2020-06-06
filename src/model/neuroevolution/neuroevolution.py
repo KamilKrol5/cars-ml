@@ -1,10 +1,14 @@
-from typing import Tuple, List, Generator
+from typing import Tuple, List, Generator, TypeVar
 
 import numpy as np
 
+import utils
 from model.environment.environment import Environment
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
 from model.neuroevolution.individual import AdultIndividual, ChildIndividual
+
+
+T = TypeVar("T")
 
 
 class Neuroevolution:
@@ -58,18 +62,14 @@ class Neuroevolution:
     _REPRODUCTION_PROBABILITIES = np.array(_REPRODUCTION_RATE) / sum(_REPRODUCTION_RATE)
     _MUTATION_PROBABILITIES = np.array(_MUTATION_RATE) / sum(_MUTATION_RATE)
 
-    def __init__(
-        self, networks: List[ChildIndividual],
-    ) -> None:
+    def __init__(self, networks: List[ChildIndividual],) -> None:
         self._new_generation: List[ChildIndividual] = networks
         self.individuals: List[AdultIndividual] = []
         self._parents: List[AdultIndividual] = []
 
     @classmethod
     def init_with_neural_network_info(
-        cls,
-        layers_infos: List[LayerInfo],
-        output_neurons: int,
+        cls, layers_infos: List[LayerInfo], output_neurons: int,
     ) -> "Neuroevolution":
         return cls(
             [
@@ -118,7 +118,9 @@ class Neuroevolution:
                 )(individual)
         return individuals
 
-    def generate_evolution(self, environment: Environment, with_parents: bool) -> Generator[None, Any, None]:
+    def generate_evolution(
+        self, environment: Environment[T], with_parents: bool
+    ) -> Generator[None, T, None]:
         """
         Evaluates individuals from current generation and
         produce new generation out of the best.
@@ -148,6 +150,5 @@ class Neuroevolution:
         children: List[ChildIndividual] = self._reproduction(self._parents)
         self._new_generation = self._mutation(children)
 
-    def evolve(self, environment: Environment, with_parents: bool) -> None:
-        for _ in self.generate_evolution(environment, with_parents):
-            pass
+    def evolve(self, environment: Environment[None], with_parents: bool) -> None:
+        return utils.generator_value(self.generate_evolution(environment, with_parents))
