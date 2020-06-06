@@ -16,7 +16,7 @@ from view.view import View
 
 
 class TrackView(View):
-    simulation: Simulation
+    simulation: Optional[Simulation]
     simulation_class: Type[Simulation]
     dataset: Dict[str, Any]
     board: Surface
@@ -43,30 +43,26 @@ class TrackView(View):
         return track_view
 
     def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
-        if x := self._process_events(events):
+        if (x := self._process_events(events)) is not None:
             return x
+
         # TODO draw cars/optimisation
-        board = self.board.copy()
-
         # Displaying cars will be re-added when the final version of simulation interface will be available
+        # surface stitching may be optimised
 
-        # may be optimised
-        if (
-            destination.get_width() > board.get_width()
-            or destination.get_height() > board.get_height()
-        ):
-            board = self.board
-            new_size = (
-                max(board.get_width(), destination.get_width()),
-                max(board.get_height(), destination.get_height()),
-            )
-            anchor = Vec2(*new_size)
-            anchor -= board.get_size()
-            anchor /= 2
-            new_board = Surface(new_size)
-            new_board.fill(self.background_color)
-            new_board.blit(board, Rect(anchor, self.board.get_size()))
-            board = new_board
+        # to be refactored
+        board = self.board.copy()
+        new_size = (
+            max(board.get_width(), destination.get_width()),
+            max(board.get_height(), destination.get_height()),
+        )
+        anchor = Vec2(*new_size)
+        anchor -= board.get_size()
+        anchor /= 2
+        new_board = Surface(new_size)
+        new_board.fill(self.background_color)
+        new_board.blit(board, Rect(anchor, self.board.get_size()))
+        board = new_board
 
         view_rect: Rect = destination.get_rect()
         limit_x = destination.get_width() // 2
@@ -91,6 +87,7 @@ class TrackView(View):
         pygame.key.set_repeat(350, 50)
 
     def _prepare_board(self) -> None:
+        assert self.simulation is not None
         track: Track = self.simulation.track
         board_size = (
             track.bounding_box.width * self.scale,
