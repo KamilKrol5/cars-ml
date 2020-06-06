@@ -13,6 +13,7 @@ from view.action import Action, ActionType
 from view.menu import Menu
 from view.track_view import TrackView
 from view.window import Window
+from view.options_menu import OptionsMenu
 
 WINDOW_NAME = "CarsML"
 WINDOW_SIZE = (1280, 800)
@@ -68,8 +69,7 @@ def main() -> None:
     window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_MIN_SIZE)
 
     menu_options = {
-        "Track": Action(ActionType.CHANGE_VIEW, 1),
-        "Testing segment": Action(ActionType.CHANGE_VIEW, 2),
+        "Train": Action(ActionType.CHANGE_VIEW, 1),
         "Exit": Action(ActionType.SYS_EXIT),
     }
     menu = Menu(menu_options)
@@ -78,10 +78,23 @@ def main() -> None:
 
     tv1 = TrackView(Track.from_points(tracks[1]["points"]))
     tv2 = TrackView(Track.from_points(tracks[3]["points"]))
+    tv3 = TrackView(Track.from_points(tracks[4]["points"]))
+
+    track_options = {
+        "Track1": Action(ActionType.CHANGE_VIEW, 2),
+        "Track2": Action(ActionType.CHANGE_VIEW, 3),
+        "Track3": Action(ActionType.CHANGE_VIEW, 4),
+    }
+    options_menu = OptionsMenu(tracks=track_options)
+    options_menu.background_image = pygame.image.load(
+        "resources/graphics/menu-background.png"
+    )
 
     window.add_view(menu, 0, True)
-    window.add_view(tv1, 1)
-    window.add_view(tv2, 2)
+    window.add_view(tv1, 2)
+    window.add_view(tv2, 3)
+    window.add_view(tv3, 4)
+    window.add_view(options_menu, 1)
 
     window.run()
 
