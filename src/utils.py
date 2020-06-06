@@ -1,5 +1,5 @@
 import itertools
-from typing import Iterable, Tuple, TypeVar, MutableSequence, Union
+from typing import Iterable, Tuple, TypeVar, MutableSequence, Union, Any, Generator
 
 import numpy as np
 
@@ -42,3 +42,11 @@ def swap_numpy_same_index(
         array2[swap_index],
         array1[swap_index].copy(),
     )
+
+
+def generator_value(gen: Generator[Any, None, T]) -> T:
+    try:
+        while True:
+            next(gen)
+    except StopIteration as si:
+        return si.value

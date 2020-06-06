@@ -9,7 +9,11 @@ from model.geom.track import Track
 @dataclass
 class Simulation:
     track: Track
-    ai: Any = None
+    cars: List[Car]
 
     def get_positions(self) -> List[Car]:
         return []
+
+    def tick(self, delta_time: float) -> List[Car]:
+        for car in self.cars:
+            car.tick()

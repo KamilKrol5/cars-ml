@@ -10,6 +10,7 @@ from pygame.surface import Surface
 
 from model.geom.track import Track
 from model.simulation import Simulation
+from model.neuroevolution.neuroevolution import Neuroevolution
 from view import colors
 from view.action import Action, ActionType
 from view.view import View
@@ -42,6 +43,9 @@ class TrackView(View):
         track_view.dataset = dataset
         return track_view
 
+    neuroevolution = Neuroevolution(None)
+    evo = neuroevolution.generate_evolution(None, False)
+
     def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
         if (x := self._process_events(events)) is not None:
             return x
@@ -63,6 +67,11 @@ class TrackView(View):
         new_board.fill(self.background_color)
         new_board.blit(board, Rect(anchor, self.board.get_size()))
         board = new_board
+
+        try:
+            self.evo.send(destination)
+        except StopIteration as si:
+            self.evo = self.neuroevolution.generate_evolution(None, False)
 
         view_rect: Rect = destination.get_rect()
         limit_x = destination.get_width() // 2
