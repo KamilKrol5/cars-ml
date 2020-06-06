@@ -85,6 +85,6 @@ class Menu(View):
                     self.selected_item = (self.selected_item - 1) % len(self._options)
                 elif event.key == pygame.K_DOWN:
                     self.selected_item = (self.selected_item + 1) % len(self._options)
-                elif event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     return True
         return False

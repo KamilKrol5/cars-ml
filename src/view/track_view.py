@@ -22,7 +22,7 @@ class TrackView(View):
     board: Surface
     coord_start: Vec2
     scale = 1.0
-    poi = Vec2(0, 0)
+    point_of_interest = Vec2(0, 0)
     # margin = 0
     background_color = colors.GRAY
     foreground_color = colors.BLACK
@@ -35,27 +35,25 @@ class TrackView(View):
 
     @classmethod
     def from_dataset(
-            cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
+        cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
     ) -> TrackView:
-        tv = cls(None)
-        tv.simulation_class = simulation_class
-        tv.dataset = dataset
-        return tv
+        track_view = cls(None)
+        track_view.simulation_class = simulation_class
+        track_view.dataset = dataset
+        return track_view
 
     def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
         if x := self._process_events(events):
             return x
         # TODO draw cars/optimisation
         board = self.board.copy()
-        for car in self.simulation.get_positions():
-            pygame.draw.circle(
-                board, self.car_color, (car.position_x, car.position_y), 10
-            )
+
+        # Displaying cars will be re-added when the final version of simulation interface will be available
 
         # may be optimised
         if (
-                destination.get_width() > board.get_width()
-                or destination.get_height() > board.get_height()
+            destination.get_width() > board.get_width()
+            or destination.get_height() > board.get_height()
         ):
             board = self.board
             new_size = (
@@ -73,8 +71,12 @@ class TrackView(View):
         view_rect: Rect = destination.get_rect()
         limit_x = destination.get_width() // 2
         limit_y = destination.get_height() // 2
-        center_x = min(max(limit_x, self.poi.x), board.get_width() - limit_x)
-        center_y = min(max(limit_y, self.poi.y), board.get_height() - limit_y)
+        center_x = min(
+            max(limit_x, self.point_of_interest.x), board.get_width() - limit_x
+        )
+        center_y = min(
+            max(limit_y, self.point_of_interest.y), board.get_height() - limit_y
+        )
         view_rect.center = (int(center_x), int(center_y))
 
         destination.blit(board.subsurface(view_rect), (0, 0))
@@ -117,26 +119,26 @@ class TrackView(View):
                     return Action(ActionType.CHANGE_VIEW, 0)
                 elif event.key == pygame.K_KP_PLUS:
                     self.scale *= 1.6
-                    self.poi *= 1.6
+                    self.point_of_interest *= 1.6
                     self._prepare_board()
                 elif event.key == pygame.K_KP_MINUS:
                     self.scale *= 0.625
-                    self.poi *= 0.625
+                    self.point_of_interest *= 0.625
                     self._prepare_board()
-                print(self.poi, self.scale, self.board.get_size())
+                print(self.point_of_interest, self.scale, self.board.get_size())
 
             # TODO change to previous view
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN:
-                    self.poi = self.poi + (0, change)
+                    self.point_of_interest = self.point_of_interest + (0, change)
                 elif event.key == pygame.K_UP:
-                    self.poi = self.poi + (0, -change)
+                    self.point_of_interest = self.point_of_interest + (0, -change)
                 elif event.key == pygame.K_LEFT:
-                    self.poi = self.poi + (-change, 0)
+                    self.point_of_interest = self.point_of_interest + (-change, 0)
                 elif event.key == pygame.K_RIGHT:
-                    self.poi = self.poi + (change, 0)
+                    self.point_of_interest = self.point_of_interest + (change, 0)
                 elif event.key == pygame.K_RIGHT:
-                    self.poi = self.poi + (change, 0)
-                print(self.poi, self.scale, self.board.get_size())
+                    self.point_of_interest = self.point_of_interest + (change, 0)
+                print(self.point_of_interest, self.scale, self.board.get_size())
 
         return None
