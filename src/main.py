@@ -17,6 +17,7 @@ from view.window import Window
 
 WINDOW_NAME = "CarsML"
 WINDOW_SIZE = (1280, 800)
+WINDOW_MIN_SIZE = (800, 600)
 
 
 def main_no_ui() -> None:
@@ -48,7 +49,7 @@ def main() -> None:
     except (IOError, IndexError):
         raise IOError("Unable to load tracks from file")
 
-    window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_SIZE)
+    window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_MIN_SIZE)
 
     menu_options = {
         "Train": Action(ActionType.CHANGE_VIEW, 1),

@@ -66,7 +66,7 @@ class TrackView(View):
             anchor -= board.get_size()
             anchor /= 2
             new_board = Surface(new_size)
-            new_board.fill((0, 250, 0))
+            new_board.fill(self.background_color)
             new_board.blit(board, Rect(anchor, self.board.get_size()))
             board = new_board
 
