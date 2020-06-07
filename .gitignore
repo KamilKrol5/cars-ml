@@ -133,3 +133,6 @@ dmypy.json
 
 # my stuff
 notes/
+
+# neural networks store
+store/

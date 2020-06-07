@@ -13,8 +13,8 @@ np.set_printoptions(suppress=True)
 
 @dataclass
 class LayerInfo:
-    activation_function_name: str
     neurons_count: int
+    activation_function_name: str
 
 
 class Layer:

@@ -5,7 +5,7 @@ import numpy as np
 from model.geom.directed_rect import DirectedRectangle
 from model.geom.sensor import Sensor
 from model.geom.track import Track, SegmentId
-from model.neural_network_old import NeuralNetwork
+from model.neural_network.neural_network import NeuralNetwork
 
 
 class Collision(Exception):
@@ -79,11 +79,10 @@ class Car:
 
     def tick(self, track: Track, delta_time: float) -> None:
         distances = self._sense_surroundings(track)
-        turning_rate, acceleration = self.neural_network.compute(np.array(distances))
+        turning_rate, acceleration = self.neural_network.predict(
+            np.expand_dims(np.array(distances), 0)
+        )[0]
         self._move(turning_rate, delta_time, track)
         if self._check_collision(track):
             raise Collision
         self._update_speed(acceleration, delta_time)
-
-    def go_brrrr(self) -> None:
-        print("brrr!")
