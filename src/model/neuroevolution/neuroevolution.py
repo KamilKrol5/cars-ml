@@ -61,8 +61,10 @@ class Neuroevolution:
     _REPRODUCTION_PROBABILITIES = np.array(_REPRODUCTION_RATE) / sum(_REPRODUCTION_RATE)
     _MUTATION_PROBABILITIES = np.array(_MUTATION_RATE) / sum(_MUTATION_RATE)
 
-    def __init__(self, networks: List[ChildIndividual]) -> None:
-        self._new_generation: List[ChildIndividual] = networks
+    def __init__(self, networks: List[NeuralNetwork]) -> None:
+        self._new_generation: List[ChildIndividual] = [
+            ChildIndividual(nn) for nn in networks
+        ]
         self.individuals: List[AdultIndividual] = []
         self._parents: List[AdultIndividual] = []
 
@@ -72,7 +74,7 @@ class Neuroevolution:
     ) -> "Neuroevolution":
         return cls(
             [
-                ChildIndividual(NeuralNetwork(layers_infos, output_neurons))
+                NeuralNetwork(layers_infos, output_neurons)
                 for _ in range(cls._INDIVIDUALS)
             ],
         )
