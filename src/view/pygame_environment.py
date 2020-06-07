@@ -6,7 +6,7 @@ from planar import Point, Vec2
 from pygame.surface import Surface
 
 from model.environment.environment import Environment
-from model.geom.track import Track
+from model.track.track import Track
 from model.neural_network.neural_network import NeuralNetwork
 from model.simulation import Simulation, SimState, CarState, FIXED_DELTA_TIME
 from view import colors

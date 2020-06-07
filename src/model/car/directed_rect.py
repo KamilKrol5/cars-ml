@@ -105,6 +105,6 @@ class DirectedRectangle:
         # if pivot is on the left, angle's sign is reversed
         angle = -1.0 * _ANGLE_CALCULATION_HELPER * speed * delta_time / radius
 
-        transform = Affine.rotation(angle, self.right_direction * radius)
+        transform = Affine.rotation(angle, self.center + self.right_direction * radius)
 
         return transform
