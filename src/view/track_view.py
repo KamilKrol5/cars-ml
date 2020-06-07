@@ -65,7 +65,7 @@ class TrackView(View):
             return None
 
         board = self.board.copy()
-        context = EnvironmentContext(board, delta_time, self.coord_start)
+        context = EnvironmentContext(board, delta_time, self.coord_start, self.scale)
         try:
             self.generator.send(context)
         except StopIteration:
@@ -88,10 +88,16 @@ class TrackView(View):
         limit_x = destination.get_width() // 2
         limit_y = destination.get_height() // 2
         center_x = min(
-            max(limit_x, context.point_of_interest.x), board.get_width() - limit_x
+            max(
+                limit_x, (context.point_of_interest.x - self.coord_start.x) * self.scale
+            ),
+            board.get_width() - limit_x,
         )
         center_y = min(
-            max(limit_y, context.point_of_interest.y), board.get_height() - limit_y
+            max(
+                limit_y, (context.point_of_interest.y - self.coord_start.y) * self.scale
+            ),
+            board.get_height() - limit_y,
         )
         view_rect.center = (int(center_x), int(center_y))
 
@@ -118,11 +124,13 @@ class TrackView(View):
             points: Iterable[Vec2] = segment.region
             points = [(point - self.coord_start) * self.scale for point in points]
             pygame.draw.polygon(board_surf, self.foreground_color, points)
-            pygame.draw.polygon(board_surf, colors.WHITE, points, 2)
-            center_1 = segment.region.centroid
-            if center_1 is not None:
-                center_1 = tuple(map(int, center_1 - self.coord_start))
-                pygame.draw.circle(board_surf, colors.RED, center_1, 1)
+            pygame.draw.polygon(board_surf, colors.LIGHTGRAY, points, 2)
+            segment_center = segment.region.centroid
+            if segment_center is not None:
+                segment_center = tuple(
+                    map(int, (segment_center - self.coord_start) * self.scale)
+                )
+                pygame.draw.circle(board_surf, colors.WHITE, segment_center, 1)
 
         self.board = board_surf
 
@@ -131,7 +139,7 @@ class TrackView(View):
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
                     return Action(ActionType.CHANGE_VIEW, 0)
-                elif event.key == pygame.K_KP_PLUS:
+                elif event.key == pygame.K_KP_PLUS and self.scale < 5:
                     self.scale *= 1.6
                     self._prepare_board()
                 elif event.key == pygame.K_KP_MINUS:
@@ -139,7 +147,7 @@ class TrackView(View):
                     self._prepare_board()
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     self._paused = not self._paused
-        # print(self.scale, self.board.get_size())
+        print(self.scale, self.board.get_size())
         # TODO change to previous view
         return None
 
