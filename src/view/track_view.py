@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List, Optional, Type, Dict, Any, Iterable
+from typing import List, Optional, Iterable, Generator
 
 import pygame
 from planar import Vec2
@@ -9,49 +9,67 @@ from pygame.rect import Rect
 from pygame.surface import Surface
 
 from model.track.track import Track
-from model.simulation import Simulation
+from model.neural_network.neural_network import LayerInfo
+from model.neuroevolution.neuroevolution import Neuroevolution
 from view import colors
 from view.action import Action, ActionType
+from view.pygame_environment import PyGameEnvironment, EnvironmentContext
 from view.view import View
 
 
 class TrackView(View):
-    simulation: Optional[Simulation]
-    simulation_class: Type[Simulation]
-    dataset: Dict[str, Any]
-    board: Surface
-    coord_start: Vec2
+    generator: Generator[None, EnvironmentContext, None]
+    track: Track
+    environment: PyGameEnvironment
+
+    neuroevolution: Neuroevolution
+
+    _paused = False
     scale = 1.0
-    point_of_interest = Vec2(0, 0)
-    # margin = 0
+    coord_start: Vec2
+    board: Surface
+    last_frame: Surface = Surface((1, 1))
     background_color = colors.GRAY
     foreground_color = colors.BLACK
     car_color = colors.RED
 
-    def __init__(self, simulation: Optional[Simulation]):
+    def __init__(self, track: Track):
         super().__init__()
-        # to make non optional, as it really is, builder would be required
-        self.simulation = simulation
+        self.track = track
+        layers_infos: List[LayerInfo] = [
+            LayerInfo(10, "sigmoid"),
+            LayerInfo(20, "relu"),
+            LayerInfo(10, "sigmoid"),
+        ]
+        self.environment = PyGameEnvironment(track)
+        self.neuroevolution = Neuroevolution.init_with_neural_network_info(
+            layers_infos, 2
+        )
 
-    @classmethod
-    def from_dataset(
-        cls, simulation_class: Type[Simulation], dataset: Dict[str, Any]
-    ) -> TrackView:
-        track_view = cls(None)
-        track_view.simulation_class = simulation_class
-        track_view.dataset = dataset
-        return track_view
-
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(
+        self, destination: Surface, events: List[EventType], delta_time: float
+    ) -> Optional[Action]:
         if (x := self._process_events(events)) is not None:
             return x
 
-        # TODO draw cars/optimisation
-        # Displaying cars will be re-added when the final version of simulation interface will be available
-        # surface stitching may be optimised
+        if self._paused:
+            width, height = destination.get_size()
+            frame_size = (int(width * 0.9), int(height * 0.9))
+            frame_start = (int(width * 0.05), int(height * 0.05))
+            last_frame = pygame.transform.scale(self.last_frame, frame_size)
+            # TODO: Paused label
+            destination.fill(colors.BLACK)
+            destination.blit(last_frame, frame_start)
+            return None
 
-        # to be refactored
         board = self.board.copy()
+        context = EnvironmentContext(board, delta_time, self.coord_start)
+        try:
+            self.generator.send(context)
+        except StopIteration:
+            self._paused = True
+            self.generator = self._get_generator()
+
         new_size = (
             max(board.get_width(), destination.get_width()),
             max(board.get_height(), destination.get_height()),
@@ -68,74 +86,62 @@ class TrackView(View):
         limit_x = destination.get_width() // 2
         limit_y = destination.get_height() // 2
         center_x = min(
-            max(limit_x, self.point_of_interest.x), board.get_width() - limit_x
+            max(limit_x, context.point_of_interest.x), board.get_width() - limit_x
         )
         center_y = min(
-            max(limit_y, self.point_of_interest.y), board.get_height() - limit_y
+            max(limit_y, context.point_of_interest.y), board.get_height() - limit_y
         )
         view_rect.center = (int(center_x), int(center_y))
 
-        destination.blit(board.subsurface(view_rect), (0, 0))
-
+        self.last_frame = board.subsurface(view_rect)
+        destination.blit(self.last_frame, (0, 0))
         return None
 
     def activate(self) -> None:
         super().activate()
-        if not self.simulation:
-            self.simulation = self.simulation_class(**self.dataset)
         self._prepare_board()
-        pygame.key.set_repeat(350, 50)
+        self.generator = self._get_generator()
 
     def _prepare_board(self) -> None:
-        assert self.simulation is not None
-        track: Track = self.simulation.track
         board_size = (
-            track.bounding_box.width * self.scale,
-            track.bounding_box.height * self.scale,
+            self.track.bounding_box.width * self.scale,
+            self.track.bounding_box.height * self.scale,
         )
-        self.coord_start = track.bounding_box.min_point
-        # board_size += 2 * Vec2(self.margin, self.margin)
-        # board_start = track.boundaries[0] * self.scale
+        self.coord_start = self.track.bounding_box.min_point
         board_surf = Surface(board_size)
-        # board_rect = Rect(board_start, board_size)
         board_surf.fill(colors.BIZARRE_MASKING_PURPLE)
         board_surf.set_colorkey(colors.BIZARRE_MASKING_PURPLE, pygame.RLEACCEL)
 
-        for segment in track.segments:
+        for segment in self.track.segments:
             points: Iterable[Vec2] = segment.region
             points = [(point - self.coord_start) * self.scale for point in points]
             pygame.draw.polygon(board_surf, self.foreground_color, points)
+            pygame.draw.polygon(board_surf, colors.WHITE, points, 2)
+            center_1 = segment.region.centroid
+            if center_1 is not None:
+                center_1 = tuple(map(int, center_1 - self.coord_start))
+                pygame.draw.circle(board_surf, colors.RED, center_1, 1)
 
         self.board = board_surf
 
     def _process_events(self, events: List[EventType]) -> Optional[Action]:
-        change = 20
         for event in events:
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
                     return Action(ActionType.CHANGE_VIEW, 0)
                 elif event.key == pygame.K_KP_PLUS:
                     self.scale *= 1.6
-                    self.point_of_interest *= 1.6
                     self._prepare_board()
                 elif event.key == pygame.K_KP_MINUS:
                     self.scale *= 0.625
-                    self.point_of_interest *= 0.625
                     self._prepare_board()
-                print(self.point_of_interest, self.scale, self.board.get_size())
-
-            # TODO change to previous view
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self.point_of_interest = self.point_of_interest + (0, change)
-                elif event.key == pygame.K_UP:
-                    self.point_of_interest = self.point_of_interest + (0, -change)
-                elif event.key == pygame.K_LEFT:
-                    self.point_of_interest = self.point_of_interest + (-change, 0)
-                elif event.key == pygame.K_RIGHT:
-                    self.point_of_interest = self.point_of_interest + (change, 0)
-                elif event.key == pygame.K_RIGHT:
-                    self.point_of_interest = self.point_of_interest + (change, 0)
-                print(self.point_of_interest, self.scale, self.board.get_size())
-
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                    self._paused = not self._paused
+        # print(self.scale, self.board.get_size())
+        # TODO change to previous view
         return None
+
+    def _get_generator(self) -> Generator[None, EnvironmentContext, None]:
+        generator = self.neuroevolution.generate_evolution(self.environment, True)
+        next(generator)
+        return generator

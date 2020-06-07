@@ -8,7 +8,6 @@ from model.car.car import Car
 from model.car.sensor import Sensor
 from model.neural_network.neural_network import NeuralNetwork, LayerInfo
 from model.neural_network.neural_network_store import NeuralNetworkStore
-from model.simulation import Simulation
 from model.track.track import Track
 from view.action import Action, ActionType
 from view.menu import Menu
@@ -77,18 +76,14 @@ def main() -> None:
     menu.background_image = pygame.image.load("resources/graphics/menu-background.png")
     menu.logo_image = pygame.image.load("resources/graphics/logo.png")
 
-    track1 = Track.from_points(tracks[0]["points"])
-    tv1 = TrackView.from_dataset(Simulation, {"track": track1, "cars": {}})
-
-    track2 = Track.from_points(tracks[1]["points"])
-    tv2 = TrackView.from_dataset(Simulation, {"track": track2, "cars": {}})
+    tv = TrackView(Track.from_points(tracks[1]["points"]))
 
     window.add_view(menu, 0, True)
-    window.add_view(tv1, 1)
-    window.add_view(tv2, 2)
+    window.add_view(tv, 1)
+    # window.add_view(tv2, 2)
 
     window.run()
 
 
 if __name__ == "__main__":
-    main_no_ui()
+    main()

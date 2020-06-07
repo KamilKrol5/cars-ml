@@ -5,7 +5,9 @@ from model.car.car import Car, Collision
 from model.neural_network.neural_network import NeuralNetwork
 from model.track.track import Track
 
-FIXED_DELTA_TIME = 1.0 / 120.0
+from planar.transform import Affine
+
+FIXED_DELTA_TIME = 1.0 / 10.0
 
 
 @dataclass
@@ -24,12 +26,14 @@ class Simulation:
     def __init__(self, track: Track, cars: Mapping[str, List[NeuralNetwork]]):
         self.track = track
         self.cars = {
-            name: [self._make_car(nn) for nn in group] for name, group in cars.items()
+            name: [self._make_car(nn, track) for nn in group]
+            for name, group in cars.items()
         }
 
     @staticmethod
-    def _make_car(nn: NeuralNetwork) -> CarState:
+    def _make_car(nn: NeuralNetwork, track: Track) -> CarState:
         car = Car.with_standard_sensors((10.0, 20.0), nn)
+        car.transform(Affine.translation(track.segments[5].region.centroid))
         return CarState(car, True)
 
     def update(self, delta_time: float) -> Tuple[float, SimState]:
@@ -40,10 +44,11 @@ class Simulation:
             Tuple with remaining time and current state of the simulation.
         """
         state = self.cars
-        while delta_time > FIXED_DELTA_TIME:
+        adjusted = 1 * FIXED_DELTA_TIME
+        while delta_time >= adjusted:
             state = self.fixed_update(FIXED_DELTA_TIME)
-            delta_time -= FIXED_DELTA_TIME
-
+            delta_time -= adjusted
+        # print(self.cars[0])
         return delta_time, state
 
     def fixed_update(self, delta_time: float) -> SimState:

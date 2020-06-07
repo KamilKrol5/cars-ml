@@ -31,8 +31,10 @@ class Window:
         self._min_size = min_size
 
     def run(self) -> None:
+        clock = pygame.time.Clock()
 
         while not self._closing:
+            delta_time: float = clock.tick()
             event_passthrough = []
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -54,7 +56,7 @@ class Window:
 
             if (
                 x := self._view_manager.active_view.draw(
-                    self._screen, event_passthrough
+                    self._screen, event_passthrough, delta_time
                 )
             ) is not None:
                 if x.type == ActionType.SYS_EXIT:

@@ -28,7 +28,9 @@ class Menu(View):
         self.button_dims = (360, 80)
         self.divider = 0.4
 
-    def draw(self, destination: Surface, events: List[EventType]) -> Optional[Action]:
+    def draw(
+        self, destination: Surface, events: List[EventType], delta_time: float
+    ) -> Optional[Action]:
         # TODO add activation check for consistency
         size = destination.get_size()
         self._update_geometry(size)

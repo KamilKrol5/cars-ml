@@ -15,12 +15,12 @@ class Neuroevolution:
     Genetic algorithm.
     """
 
-    _INDIVIDUALS: int = 300
+    _INDIVIDUALS: int = 30
     """
     Amount of individuals per generation, minimum 3.
     """
 
-    _GOLDEN_TICKETS: int = 20
+    _GOLDEN_TICKETS: int = 10
     """
     Amount of individuals allowed to reproduce for sure.
     """

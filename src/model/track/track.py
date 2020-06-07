@@ -97,7 +97,8 @@ class Track:
         for segment_id in self._spread_segment_ids(active_segment):
             if self.segments[segment_id].is_point_inside(center):
                 return segment_id
-        raise RuntimeError("none of the track's segments contain the given point")
+        # raise RuntimeError("none of the track's segments contain the given point")
+        return active_segment
 
     @cached_property
     def bounding_box(self) -> BoundingBox:

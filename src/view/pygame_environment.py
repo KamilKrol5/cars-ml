@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from typing import Mapping, Iterable, Generator, List
 
 import pygame
+from planar import Point, Vec2
 from pygame.surface import Surface
 
 from model.environment.environment import Environment
 from model.geom.track import Track
 from model.neural_network.neural_network import NeuralNetwork
-from model.simulation import Simulation, SimState, CarState
+from model.simulation import Simulation, SimState, CarState, FIXED_DELTA_TIME
 from view import colors
 
 
@@ -15,6 +16,8 @@ from view import colors
 class EnvironmentContext:
     surface: Surface
     frame_time: float
+    offset: Vec2
+    point_of_interest: Point = Point(0, 0)
 
 
 @dataclass
@@ -30,7 +33,7 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
 
         while any_active:
             context: EnvironmentContext = (yield)
-            frame_time += context.frame_time
+            frame_time += FIXED_DELTA_TIME
             frame_time, cars = simulation.update(frame_time)
 
             any_active = False
@@ -45,7 +48,9 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
 
                     # TODO: drawing in the right place
                     pygame.draw.polygon(
-                        context.surface, color, car_state.car.rect.shape, 10
+                        context.surface,
+                        color,
+                        [a - context.offset for a in car_state.car.rect.shape],
                     )
 
         return self._compute(cars)
@@ -59,4 +64,4 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
 
     def _car_adaptation(self, car_state: CarState) -> float:
         # TODO: something more sophisticated
-        return car_state.car.active_segment
+        return car_state.car.active_segment + 1
