@@ -1,12 +1,11 @@
 from dataclasses import dataclass
+from typing import List
 
+import numpy as np
 from planar import Vec2, Point, EPSILON
 from planar.line import Ray
 from planar.polygon import Polygon
 from planar.transform import Affine
-
-import numpy as np
-
 
 _ANGLE_CALCULATION_HELPER: float = 90 / np.square(np.pi)
 
@@ -32,6 +31,18 @@ class DirectedRectangle:
         )
 
         return cls(Ray(center, Vec2(1, 0)), shape)
+
+    def surrounding_rays(self) -> List[Ray]:
+        """Constructs rays going in 8 directions around this rectangle."""
+        forward = Ray(self.center, self.direction)
+        backward = Ray(self.center, -self.direction)
+        corners = [Ray(self.center, corner) for corner in self.shape]
+        sides = [
+            Ray(self.center, self.right_direction),
+            Ray(self.center, self.left_direction),
+        ]
+
+        return [forward, backward, *sides, *corners]
 
     @property
     def center(self) -> Point:

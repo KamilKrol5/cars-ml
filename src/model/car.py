@@ -1,6 +1,7 @@
 from typing import Tuple, List
 
 import numpy as np
+from planar.transform import Affine
 
 from model.geom.directed_rect import DirectedRectangle
 from model.geom.sensor import Sensor
@@ -34,20 +35,34 @@ class Car:
         self.speed = 0.0
         self.active_segment: SegmentId = 0
 
+    @classmethod
+    def with_standard_sensors(
+        cls, size: Tuple[float, float], neural_network: NeuralNetwork
+    ) -> "Car":
+        self = cls(size, [], neural_network)
+
+        rays = self.rect.surrounding_rays()
+        self.sensors = [Sensor(ray) for ray in rays]
+
+        return self
+
     def _sense_surroundings(self, track: Track) -> List[float]:
         return track.sense_closest(self.sensors, self.active_segment)
 
     def _check_collision(self, track: Track) -> bool:
         return track.intersects(self.rect.shape, self.active_segment)
 
+    def transform(self, trans: Affine) -> None:
+        for sensor in self.sensors:
+            sensor.transform(trans)
+        self.rect.transform(trans)
+
     def _move(self, turning_rate: float, delta_time: float, track: Track) -> None:
         transform = self.rect.turn_curve_transform(
             self.speed, Car._TRACTION, turning_rate, delta_time
         )
 
-        for sensor in self.sensors:
-            sensor.transform(transform)
-        self.rect.transform(transform)
+        self.transform(transform)
 
         self.active_segment = track.update_active(self.active_segment, self.rect.center)
 
