@@ -89,10 +89,10 @@ class NeuralNetwork:
         for layer_info, next_layer_info in zip(
             hidden_layers_info[:-1], hidden_layers_info[1:]
         ):
-            weights = np.random.rand(
-                next_layer_info.neurons_count, layer_info.neurons_count,
+            weights = np.random.uniform(
+                -1, 1, (next_layer_info.neurons_count, layer_info.neurons_count),
             )
-            biases = np.random.rand(next_layer_info.neurons_count)
+            biases = np.random.uniform(-1, 1, next_layer_info.neurons_count)
             hidden_layers.append(Layer(layer_info, weights, biases))
 
         last_hidden_layer_info = hidden_layers_info[-1]
