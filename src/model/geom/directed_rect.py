@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 from planar import Vec2, Point, EPSILON
-from planar.line import Ray
+from planar.line import Ray, LineSegment
 from planar.polygon import Polygon
 from planar.transform import Affine
 
@@ -24,25 +24,36 @@ class DirectedRectangle:
         shape = Polygon.from_points(
             [
                 top_right,
-                top_right - Vec2(length, 0),
-                top_right - Vec2(length, width),
                 top_right - Vec2(0, width),
+                top_right - Vec2(length, width),
+                top_right - Vec2(length, 0),
             ]
         )
 
         return cls(Ray(center, Vec2(1, 0)), shape)
 
     def surrounding_rays(self) -> List[Ray]:
-        """Constructs rays going in 8 directions around this rectangle."""
+        """
+        Constructs rays going in 8 directions around this rectangle,
+        and two more in front.
+        """
         forward = Ray(self.center, self.direction)
         backward = Ray(self.center, -self.direction)
-        corners = [Ray(self.center, corner) for corner in self.shape]
+        shape_points = list(self.shape)
+        corner_rays = [Ray(self.center, corner) for corner in shape_points]
+
+        front_side = LineSegment.from_points(shape_points[:2])
+        front_rays = [
+            Ray(self.center, front_side.start + 0.25 * front_side.vector),
+            Ray(self.center, front_side.start + 0.75 * front_side.vector),
+        ]
+
         sides = [
             Ray(self.center, self.right_direction),
             Ray(self.center, self.left_direction),
         ]
 
-        return [forward, backward, *sides, *corners]
+        return [forward, *front_rays, backward, *sides, *corner_rays]
 
     @property
     def center(self) -> Point:
