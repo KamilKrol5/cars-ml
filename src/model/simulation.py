@@ -1,12 +1,20 @@
+from dataclasses import dataclass
 from typing import List, Mapping, Tuple
 
-from model.car import Car
+from model.car import Car, Collision
 from model.geom.track import Track
 from model.neural_network.neural_network import NeuralNetwork
 
 FIXED_DELTA_TIME = 1.0 / 120.0
 
-SimState = Mapping[str, List[Tuple[Car, bool]]]
+
+@dataclass
+class CarState:
+    car: Car
+    active: bool
+
+
+SimState = Mapping[str, List[CarState]]
 
 
 class Simulation:
@@ -20,9 +28,9 @@ class Simulation:
         }
 
     @staticmethod
-    def _make_car(nn: NeuralNetwork) -> Tuple[Car, bool]:
+    def _make_car(nn: NeuralNetwork) -> CarState:
         car = Car.with_standard_sensors((10.0, 20.0), nn)
-        return car, False
+        return CarState(car, True)
 
     def update(self, delta_time: float) -> Tuple[float, SimState]:
         """
@@ -46,7 +54,10 @@ class Simulation:
         """
         state = self.cars
         for car_group in state.values():
-            for car, active in car_group:
-                if active:
-                    car.tick(self.track, delta_time)
+            for car_state in car_group:
+                if car_state.active:
+                    try:
+                        car_state.car.tick(self.track, delta_time)
+                    except Collision:
+                        car_state.active = False
         return state

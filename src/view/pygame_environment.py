@@ -4,11 +4,10 @@ from typing import Mapping, Iterable, Generator, List
 import pygame
 from pygame.surface import Surface
 
-from model.car import Car
 from model.environment.environment import Environment
 from model.geom.track import Track
 from model.neural_network.neural_network import NeuralNetwork
-from model.simulation import Simulation
+from model.simulation import Simulation, SimState, CarState
 from view import colors
 
 
@@ -37,29 +36,27 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
             any_active = False
             # TODO: differentiate cars on group_id
             for _group_id, car_group in cars.items():
-                for car, active in car_group:
-                    if active:
+                for car_state in car_group:
+                    if car_state.active:
                         color = colors.LIGHTBLUE
                         any_active = True
                     else:
                         color = colors.RED
 
                     # TODO: drawing in the right place
-                    pygame.draw.polygon(context.surface, color, car.rect.shape, 10)
+                    pygame.draw.polygon(
+                        context.surface, color, car_state.car.rect.shape, 10
+                    )
 
-        return self._compute(
-            {name: (car for car, _ in group) for name, group in cars.items()}
-        )
+        return self._compute(cars)
 
-    def _compute(
-        self, cars: Mapping[str, Iterable[Car]]
-    ) -> Mapping[str, Iterable[float]]:
+    def _compute(self, cars: SimState) -> Mapping[str, Iterable[float]]:
         return {name: self._group_adaptation(group) for name, group in cars.items()}
 
-    def _group_adaptation(self, car_group: Iterable[Car]) -> Iterable[float]:
-        for car in car_group:
-            yield self._car_adaptation(car)
+    def _group_adaptation(self, car_group: Iterable[CarState]) -> Iterable[float]:
+        for car_state in car_group:
+            yield self._car_adaptation(car_state)
 
-    def _car_adaptation(self, car: Car) -> float:
+    def _car_adaptation(self, car_state: CarState) -> float:
         # TODO: something more sophisticated
-        return car.active_segment
+        return car_state.car.active_segment
