@@ -2,7 +2,7 @@ from typing import List, Mapping, Tuple
 
 from model.car import Car
 from model.geom.track import Track
-from model.neural_network_old import NeuralNetwork
+from model.neural_network.neural_network import NeuralNetwork
 
 FIXED_DELTA_TIME = 1.0 / 120.0
 
