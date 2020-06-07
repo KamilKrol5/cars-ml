@@ -68,19 +68,20 @@ def main() -> None:
     window = Window(WINDOW_NAME, WINDOW_SIZE, resizable=True, min_size=WINDOW_MIN_SIZE)
 
     menu_options = {
-        "Train": Action(ActionType.CHANGE_VIEW, 1),
-        "Play": Action(ActionType.CHANGE_VIEW, 2),
+        "Track": Action(ActionType.CHANGE_VIEW, 1),
+        "Testing segment": Action(ActionType.CHANGE_VIEW, 2),
         "Exit": Action(ActionType.SYS_EXIT),
     }
     menu = Menu(menu_options)
     menu.background_image = pygame.image.load("resources/graphics/menu-background.png")
     menu.logo_image = pygame.image.load("resources/graphics/logo.png")
 
-    tv = TrackView(Track.from_points(tracks[1]["points"]))
+    tv1 = TrackView(Track.from_points(tracks[1]["points"]))
+    tv2 = TrackView(Track.from_points(tracks[3]["points"]))
 
     window.add_view(menu, 0, True)
-    window.add_view(tv, 1)
-    # window.add_view(tv2, 2)
+    window.add_view(tv1, 1)
+    window.add_view(tv2, 2)
 
     window.run()
 
