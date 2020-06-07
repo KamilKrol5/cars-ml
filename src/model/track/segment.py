@@ -6,7 +6,7 @@ from planar import Polygon, Vec2
 from planar.box import BoundingBox
 from planar.line import LineSegment
 
-from model.geom.wall import Wall
+from model.track.wall import Wall
 
 
 @dataclass

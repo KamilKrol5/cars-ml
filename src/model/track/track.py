@@ -7,9 +7,9 @@ from planar.line import LineSegment
 from planar.polygon import Polygon
 
 import utils
-from model.geom.segment import TrackSegment
-from model.geom.sensor import Sensor
-from model.geom.wall import Wall
+from model.track.segment import TrackSegment
+from model.car.sensor import Sensor
+from model.track.wall import Wall
 from utils import pairwise
 
 SegmentId = int

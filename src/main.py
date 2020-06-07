@@ -4,16 +4,16 @@ import pygame
 from planar import Point
 from planar.line import Ray
 
-from model.car import Car
-from model.geom.sensor import Sensor
-from model.geom.track import Track
+from model.car.car import Car
+from model.car.sensor import Sensor
+from model.neural_network.neural_network import NeuralNetwork, LayerInfo
+from model.neural_network.neural_network_store import NeuralNetworkStore
 from model.simulation import Simulation
+from model.track.track import Track
 from view.action import Action, ActionType
 from view.menu import Menu
 from view.track_view import TrackView
 from view.window import Window
-from model.neural_network.neural_network import NeuralNetwork, LayerInfo
-from model.neural_network.neural_network_store import NeuralNetworkStore
 
 WINDOW_NAME = "CarsML"
 WINDOW_SIZE = (1280, 800)
