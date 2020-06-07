@@ -25,14 +25,19 @@ def main_no_ui() -> None:
 
     neural_networks = []
     for _ in range(100):
-        neural_networks.append(NeuralNetwork([
-            LayerInfo(1, "tanh"),
-            LayerInfo(15, "sigmoid"),
-            LayerInfo(10, "sigmoid")],
-            2))
-    NeuralNetworkStore.store(neural_networks, 'data')
+        neural_networks.append(
+            NeuralNetwork(
+                [
+                    LayerInfo(1, "tanh"),
+                    LayerInfo(15, "sigmoid"),
+                    LayerInfo(10, "sigmoid"),
+                ],
+                2,
+            )
+        )
+    NeuralNetworkStore.store(neural_networks, "data")
     neural_networks.clear()
-    neural_networks = NeuralNetworkStore.load('data')
+    neural_networks = NeuralNetworkStore.load("data")
     print(len(neural_networks))
 
     neural_network = neural_networks[0]

@@ -79,7 +79,9 @@ class Car:
 
     def tick(self, track: Track, delta_time: float) -> None:
         distances = self._sense_surroundings(track)
-        turning_rate, acceleration = self.neural_network.predict(np.array(distances).reshape(1, len(distances)))[0]
+        turning_rate, acceleration = self.neural_network.predict(
+            np.expand_dims(np.array(distances), 0)
+        )[0]
         self._move(turning_rate, delta_time, track)
         if self._check_collision(track):
             raise Collision
