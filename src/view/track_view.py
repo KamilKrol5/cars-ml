@@ -8,7 +8,7 @@ from pygame.event import EventType
 from pygame.rect import Rect
 from pygame.surface import Surface
 
-from model.geom.track import Track
+from model.track.track import Track
 from model.simulation import Simulation
 from view import colors
 from view.action import Action, ActionType

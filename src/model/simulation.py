@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import List, Mapping, Tuple
 
-from model.car import Car, Collision
-from model.geom.track import Track
+from model.car.car import Car, Collision
 from model.neural_network.neural_network import NeuralNetwork
+from model.track.track import Track
 
 FIXED_DELTA_TIME = 1.0 / 120.0
 

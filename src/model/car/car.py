@@ -3,10 +3,12 @@ from typing import Tuple, List
 import numpy as np
 from planar.transform import Affine
 
-from model.geom.directed_rect import DirectedRectangle
-from model.geom.sensor import Sensor
-from model.geom.track import Track, SegmentId
+
+from model.car.sensor import Sensor
+from model.car.directed_rect import DirectedRectangle
+from model.track.track import Track, SegmentId
 from model.neural_network.neural_network import NeuralNetwork
+from model.neural_network.neural_network_adapter import NeuralNetworkAdapter
 
 
 class Collision(Exception):
@@ -20,7 +22,7 @@ class Car:
     _MAX_FORWARD_SPEED: float = 200.0
     _MAX_BACKWARD_SPEED: float = 50.0
 
-    __slots__ = ("rect", "sensors", "neural_network", "speed", "active_segment")
+    __slots__ = ("rect", "sensors", "neural_network_adapter", "speed", "active_segment")
 
     def __init__(
         self,
@@ -31,7 +33,7 @@ class Car:
         """Creates a new car at point (0,0) headed in the X axis direction."""
         self.rect = DirectedRectangle.new_origin_x(*size)
         self.sensors = sensors
-        self.neural_network = neural_network
+        self.neural_network_adapter = NeuralNetworkAdapter(neural_network)
         self.speed = 0.0
         self.active_segment: SegmentId = 0
 
@@ -94,10 +96,8 @@ class Car:
 
     def tick(self, track: Track, delta_time: float) -> None:
         distances = self._sense_surroundings(track)
-        turning_rate, acceleration = self.neural_network.predict(
-            np.expand_dims(np.array(distances), 0)
-        )[0]
-        self._move(turning_rate, delta_time, track)
+        instructions = self.neural_network_adapter.get_instructions(distances)
+        self._move(instructions.turning_rate, delta_time, track)
         if self._check_collision(track):
             raise Collision
-        self._update_speed(acceleration, delta_time)
+        self._update_speed(instructions.acceleration, delta_time)

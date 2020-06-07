@@ -7,7 +7,7 @@ from planar.transform import Affine
 
 import numpy as np
 
-from model.geom.wall import Wall
+from model.track.wall import Wall
 
 
 @dataclass
