@@ -40,4 +40,4 @@ class SilentEnvironment(Environment[None]):
 
     def _car_adaptation(self, car_state: CarState) -> float:
         # TODO: something more sophisticated
-        return car_state.car.active_segment + 1
+        return 2 * car_state.car.active_segment / (10 * car_state.car.ticks)

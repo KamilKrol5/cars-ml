@@ -16,13 +16,22 @@ class Collision(Exception):
 
 
 class Car:
-    _TRACTION: float = 1.0
+    _TRACTION: float = 8.0
     _ACCELERATION_RATE: float = 10.0
     _BRAKING_RATE: float = 5.0
     _MAX_FORWARD_SPEED: float = 200.0
+    _MIN_FORWARD_SPEED: float = 30.0
     _MAX_BACKWARD_SPEED: float = 50.0
+    _MIN_BACKWARD_SPEED: float = 5.0
 
-    __slots__ = ("rect", "sensors", "neural_network_adapter", "speed", "active_segment")
+    __slots__ = (
+        "rect",
+        "sensors",
+        "neural_network_adapter",
+        "speed",
+        "active_segment",
+        "ticks",
+    )
 
     def __init__(
         self,
@@ -36,6 +45,7 @@ class Car:
         self.neural_network_adapter = NeuralNetworkAdapter(neural_network)
         self.speed = 0.0
         self.active_segment: SegmentId = 0
+        self.ticks: int = 1
 
     @classmethod
     def with_standard_sensors(
@@ -72,8 +82,8 @@ class Car:
         speed_dir: float = np.sign(self.speed)
         acceleration_dir: float = np.sign(acceleration)
         speed_limits = {
-            1.0: (0.0, Car._MAX_FORWARD_SPEED),
-            -1.0: (-Car._MAX_BACKWARD_SPEED, 0.0),
+            1.0: (Car._MIN_FORWARD_SPEED, Car._MAX_FORWARD_SPEED),
+            -1.0: (-Car._MAX_BACKWARD_SPEED, -Car._MIN_BACKWARD_SPEED),
         }
         speed_limit = speed_limits.get(
             speed_dir, speed_limits.get(acceleration_dir, (0.0, 0.0))
@@ -101,3 +111,10 @@ class Car:
         if self._check_collision(track):
             raise Collision
         self._update_speed(instructions.acceleration, delta_time)
+        self._update_tick()
+
+    def reset_ticks(self) -> None:
+        self.ticks = 1
+
+    def _update_tick(self) -> None:
+        self.ticks += 1
