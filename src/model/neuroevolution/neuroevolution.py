@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple, List, Generator, TypeVar
 
 import numpy as np
@@ -15,12 +16,12 @@ class Neuroevolution:
     Genetic algorithm.
     """
 
-    _INDIVIDUALS: int = 30
+    _INDIVIDUALS: int = 10
     """
     Amount of individuals per generation, minimum 3.
     """
 
-    _GOLDEN_TICKETS: int = 10
+    _GOLDEN_TICKETS: int = 2
     """
     Amount of individuals allowed to reproduce for sure.
     """
@@ -35,12 +36,12 @@ class Neuroevolution:
         """
         return (individual.adaptation / bound_adaptation) ** 3
 
-    _MUTATION_CHANCE: float = 0.15
+    _MUTATION_CHANCE: float = 0.30
     """
     Mutation chance for every child.
     """
 
-    _REPRODUCTION_RATE: Tuple[int, int, int] = (5, 3, 1)
+    _REPRODUCTION_RATE: Tuple[int, int, int] = (3, 5, 5)
     """
     Proportional chance for reproduction by respectively:
     1. swapping single weight,
@@ -48,7 +49,7 @@ class Neuroevolution:
     3. swapping entire layer.
     """
 
-    _MUTATION_RATE: Tuple[int, int, int, int, int] = (10, 10, 5, 5, 1)
+    _MUTATION_RATE: Tuple[int, int, int, int, int] = (6, 6, 6, 5, 3)
     """
     Proportional chance for mutation by respectively (apply only to children with mutation):
     1. generate random value for single weight,
@@ -86,17 +87,21 @@ class Neuroevolution:
         self.individuals = self.individuals[: self._INDIVIDUALS]
 
     def _selection(self) -> List[AdultIndividual]:
-        bound_adaptation = self.individuals[self._GOLDEN_TICKETS].adaptation
+        bound_adaptation = self.individuals[0].adaptation
         parents = self.individuals[: self._GOLDEN_TICKETS]
-        for individual in self.individuals[self._GOLDEN_TICKETS : self._INDIVIDUALS]:
+        for individual in self.individuals[self._GOLDEN_TICKETS :]:
             if np.random.rand() < self._reproduction_probability(
                 individual, bound_adaptation
             ):
                 parents.append(individual)
+        print(
+            f"Individuals to reproduce: {len(parents)} out of {self._INDIVIDUALS}",
+            file=sys.stderr,
+        )
         return parents
 
     def _reproduction(self, parents: List[AdultIndividual]) -> List[ChildIndividual]:
-        children_to_make = self._INDIVIDUALS - len(parents)
+        children_to_make = 2 * self._INDIVIDUALS - len(parents)
         children: List[ChildIndividual] = []
         while len(children) < children_to_make:
             mother, father = np.random.choice(parents, size=2)
@@ -139,6 +144,7 @@ class Neuroevolution:
                 parent.neural_network for parent in self._parents
             ]
 
+        print(f"New generation size: {len(self._new_generation)}")
         adaptations = yield from environment.generate_adaptations(network_groups)
 
         new_individuals = [
