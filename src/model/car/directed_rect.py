@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 from planar import Vec2, Point, EPSILON
-from planar.line import Ray, LineSegment
+from planar.line import Ray
 from planar.polygon import Polygon
 from planar.transform import Affine
 
@@ -40,20 +40,20 @@ class DirectedRectangle:
         forward = Ray(self.center, self.direction)
         backward = Ray(self.center, -self.direction)
         shape_points = list(self.shape)
-        corner_rays = [Ray(self.center, corner) for corner in shape_points]
+        corner_rays = [Ray(self.center, corner) for corner in shape_points[:2]]
 
-        front_side = LineSegment.from_points(shape_points[:2])
-        front_rays = [
-            Ray(self.center, front_side.start + 0.25 * front_side.vector),
-            Ray(self.center, front_side.start + 0.75 * front_side.vector),
-        ]
+        # front_side = LineSegment.from_points(shape_points[:2])
+        # front_rays = [
+        #     Ray(self.center, front_side.start + 0.25 * front_side.vector),
+        #     Ray(self.center, front_side.start + 0.75 * front_side.vector),
+        # ]
 
         sides = [
             Ray(self.center, self.right_direction),
             Ray(self.center, self.left_direction),
         ]
 
-        return [forward, *front_rays, backward, *sides, *corner_rays]
+        return [forward, backward, *sides, *corner_rays]
 
     @property
     def center(self) -> Point:

@@ -25,6 +25,7 @@ class TrackView(View):
     neuroevolution: Neuroevolution
 
     _paused = False
+    input_neurons = 6
     scale = 1.0
     coord_start: Vec2
     board: Surface
@@ -37,11 +38,10 @@ class TrackView(View):
         super().__init__()
         self.track = track
         layers_infos: List[LayerInfo] = [
-            LayerInfo(10, "tanh"),
-            LayerInfo(10, "tanh"),
-            LayerInfo(10, "tanh"),
-            LayerInfo(10, "tanh"),
-            LayerInfo(5, "tanh"),
+            LayerInfo(self.input_neurons, "tanh"),
+            LayerInfo(8, "tanh"),
+            LayerInfo(12, "tanh"),
+            LayerInfo(8, "tanh"),
         ]
         self.environment = PyGameEnvironment(track)
         self.neuroevolution = Neuroevolution.init_with_neural_network_info(
