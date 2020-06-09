@@ -1,5 +1,5 @@
 import sys
-from typing import Tuple, List, Generator, TypeVar
+from typing import Tuple, List, Generator, TypeVar, Any
 
 import numpy as np
 
@@ -133,7 +133,7 @@ class Neuroevolution:
         return individuals
 
     def generate_evolution(
-        self, environment: Environment[T], with_parents: bool
+        self, environment: Environment[T, Any], with_parents: bool
     ) -> Generator[None, T, None]:
         """
         Evaluates individuals from current generation and
@@ -165,5 +165,5 @@ class Neuroevolution:
         children: List[ChildIndividual] = self._reproduction(self._parents)
         self._new_generation = self._mutation(children)
 
-    def evolve(self, environment: Environment[None], with_parents: bool) -> None:
+    def evolve(self, environment: Environment[None, Any], with_parents: bool) -> None:
         return utils.generator_value(self.generate_evolution(environment, with_parents))
