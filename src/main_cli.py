@@ -1,4 +1,5 @@
 import json
+import time
 from itertools import count
 from typing import List
 
@@ -30,13 +31,26 @@ def main() -> None:
     track = Track.from_points(tracks[1]["points"])
     env = SilentEnvironment(track)
     neuroevolution = Neuroevolution.init_with_neural_network_info(layers_infos, 2)
-
+    print(
+        f"Initialization finished. Running evolution, individuals count: {len(neuroevolution.individuals)}"
+    )
+    step = 100
+    time_start = time.time()
     for i in count(0):
         neuroevolution.evolve(env, False)
-        if i % 100 == 0:
+        if i % step == 0:
+            time_for_step_iterations = time.time() - time_start
+            print("Saving networks to file...")
             NeuralNetworkStore.store(
-                [i.neural_network for i in neuroevolution.individuals], "data"
+                [i.neural_network for i in neuroevolution.individuals], f"data{i}"
             )
+            print(
+                f"Time for {max(0, i-step)} to {i} iterations: {time_for_step_iterations}."
+            )
+            print(
+                f"Iteration: {i}; Results: {[i.adaptation for i in neuroevolution.individuals]}"
+            )
+            time_start = time.time()
 
 
 if __name__ == "__main__":
