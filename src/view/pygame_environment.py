@@ -73,4 +73,4 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
 
     @staticmethod
     def _car_adaptation(car_state: CarState) -> float:
-        return car_state.car.active_segment ** 2 / car_state.car.ticks
+        return car_state.car.active_segment ** 2 / car_state.ticks

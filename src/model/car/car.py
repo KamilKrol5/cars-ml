@@ -45,7 +45,6 @@ class Car:
         self.neural_network_adapter = NeuralNetworkAdapter(neural_network)
         self.speed = 0.0
         self.active_segment: SegmentId = 0
-        self.ticks: int = 1
 
     @classmethod
     def with_standard_sensors(
@@ -113,10 +112,3 @@ class Car:
         if self._check_collision(track):
             raise Collision
         self._update_speed(instructions.acceleration, delta_time)
-        self._update_tick()
-
-    def reset_ticks(self) -> None:
-        self.ticks = 1
-
-    def _update_tick(self) -> None:
-        self.ticks += 1

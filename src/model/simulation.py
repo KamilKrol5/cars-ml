@@ -14,6 +14,7 @@ FIXED_DELTA_TIME = 1.0 / 10.0
 class CarState:
     car: Car
     active: bool
+    ticks: int
 
 
 SimState = Mapping[str, List[CarState]]
@@ -34,7 +35,7 @@ class Simulation:
     def _make_car(nn: NeuralNetwork, track: Track) -> CarState:
         car = Car.with_standard_sensors((10.0, 20.0), nn)
         car.transform(Affine.translation(track.segments[2].region.centroid))
-        return CarState(car, True)
+        return CarState(car, True, 1)
 
     def update(self, delta_time: float) -> Tuple[float, SimState]:
         """
@@ -63,7 +64,7 @@ class Simulation:
                 if car_state.active:
                     try:
                         car_state.car.tick(self.track, delta_time)
+                        car_state.ticks += 1
                     except Collision:
-                        car_state.car.reset_ticks()
                         car_state.active = False
         return state
