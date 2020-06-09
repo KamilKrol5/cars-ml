@@ -80,4 +80,4 @@ class Environment(ABC, Generic[T_CONTEXT, T_STATE]):
             yield self._car_adaptation(car_state)
 
     def _car_adaptation(self, car_state: CarState) -> float:
-        return car_state.car.active_segment ** 2 / car_state.active_ticks
+        return car_state.car.active_segment

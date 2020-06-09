@@ -22,12 +22,15 @@ class EnvironmentContext:
 @dataclass
 class EnvironmentState:
     best_car_segment: SegmentId
+    cars_count: int = 0
 
 
 @dataclass
 class PyGameEnvironment(Environment[EnvironmentContext, EnvironmentState]):
     def __init__(self, track: Track):
         super().__init__(track)
+        pygame.font.init()
+        self.font = pygame.font.SysFont("Verdana", 24)
 
     def _initialize(self) -> EnvironmentState:
         return EnvironmentState(0)
@@ -35,6 +38,8 @@ class PyGameEnvironment(Environment[EnvironmentContext, EnvironmentState]):
     def _finalize_iteration(
         self, state: EnvironmentState, context: EnvironmentContext
     ) -> EnvironmentState:
+        txt_surface = self.font.render(f"Cars: {state.cars_count}", False, colors.WHITE)
+        context.surface.blit(txt_surface, dest=(0, 0))
         return EnvironmentState(0)
 
     def _process_car_step(
@@ -52,6 +57,7 @@ class PyGameEnvironment(Environment[EnvironmentContext, EnvironmentState]):
         else:
             color = colors.RED
 
+        state.cars_count += 1
         pygame.draw.polygon(
             context.surface,
             color,
