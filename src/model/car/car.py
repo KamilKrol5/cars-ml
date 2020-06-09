@@ -16,7 +16,7 @@ class Collision(Exception):
 
 
 class Car:
-    _TRACTION: float = 8.0
+    _TRACTION: float = 7.5
     _ACCELERATION_RATE: float = 10.0
     _BRAKING_RATE: float = 5.0
     _MAX_FORWARD_SPEED: float = 200.0

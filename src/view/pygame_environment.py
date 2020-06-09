@@ -43,7 +43,7 @@ class PyGameEnvironment(Environment[EnvironmentContext]):
             for _group_id, car_group in cars.items():
                 for car_state in car_group:
                     if car_state.active:
-                        color = colors.LIGHTBLUE
+                        color = colors.LIME
                         any_active = True
                         if car_state.car.active_segment > best_car_segment:
                             context.point_of_interest = (
