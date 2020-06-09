@@ -38,6 +38,6 @@ class SilentEnvironment(Environment[None]):
         for car_state in car_group:
             yield self._car_adaptation(car_state)
 
-    def _car_adaptation(self, car_state: CarState) -> float:
-        # TODO: something more sophisticated
-        return 2 * car_state.car.active_segment / (10 * car_state.car.ticks)
+    @staticmethod
+    def _car_adaptation(car_state: CarState) -> float:
+        return car_state.car.active_segment ** 2 / car_state.car.ticks
