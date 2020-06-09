@@ -26,6 +26,11 @@ class Neuroevolution:
     Amount of individuals allowed to reproduce for sure.
     """
 
+    _MAX_PARENTS: int = _INDIVIDUALS // 2
+    """
+    Maximal parents count.
+    """
+
     @staticmethod
     def _reproduction_probability(
         individual: AdultIndividual, bound_adaptation: float
@@ -94,6 +99,9 @@ class Neuroevolution:
                 individual, bound_adaptation
             ):
                 parents.append(individual)
+                if len(parents) == self._MAX_PARENTS:
+                    break
+
         print(
             f"Individuals to reproduce: {len(parents)} out of {self._INDIVIDUALS}",
             file=sys.stderr,
@@ -101,7 +109,7 @@ class Neuroevolution:
         return parents
 
     def _reproduction(self, parents: List[AdultIndividual]) -> List[ChildIndividual]:
-        children_to_make = 2 * self._INDIVIDUALS - len(parents)
+        children_to_make = self._INDIVIDUALS - len(parents)
         children: List[ChildIndividual] = []
         while len(children) < children_to_make:
             mother, father = np.random.choice(parents, size=2)
