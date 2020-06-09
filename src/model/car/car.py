@@ -106,7 +106,9 @@ class Car:
 
     def tick(self, track: Track, delta_time: float) -> None:
         distances = self._sense_surroundings(track)
-        instructions = self.neural_network_adapter.get_instructions(distances)
+        instructions = self.neural_network_adapter.get_instructions(
+            distances, self.speed
+        )
         self._move(instructions.turning_rate, delta_time, track)
         if self._check_collision(track):
             raise Collision

@@ -27,7 +27,7 @@ def main_no_ui() -> None:
         neural_networks.append(
             NeuralNetwork(
                 [
-                    LayerInfo(1, "tanh"),
+                    LayerInfo(8, "tanh"),
                     LayerInfo(15, "sigmoid"),
                     LayerInfo(10, "sigmoid"),
                 ],

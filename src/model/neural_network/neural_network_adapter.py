@@ -17,19 +17,20 @@ class NeuralNetworkAdapter:
             raise ValueError("Neural network need 2 output neurons to be compatible.")
         self.neural_network: NeuralNetwork = neural_network
 
-    def get_instructions(self, distances: List[float]) -> CarInstruction:
+    def get_instructions(self, distances: List[float], speed: float) -> CarInstruction:
         """
         Get instructions for car based on neural network output.
         Args:
             distances (List[float]): Distances counted by sensors.
+            speed (float): Current car's speed.
         Return:
             Instructions that define car's behavior.
         """
-        if self.neural_network.input_layer_neuron_count != len(distances):
+        if self.neural_network.input_layer_neuron_count - 1 != len(distances):
             raise ValueError(
                 "Neural network incompatible with sensors, "
                 "amount of input neurons must be equals to numbers of sensors."
             )
-        valid_input = np.expand_dims(np.array(distances), 0)
+        valid_input = np.expand_dims(np.array(distances + [speed]), 0)
         output = self.neural_network.predict(valid_input)
         return CarInstruction(*output[0])
