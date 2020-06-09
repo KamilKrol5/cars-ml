@@ -69,7 +69,6 @@ class TrackView(View):
         try:
             self.generator.send(context)
         except StopIteration:
-            self._paused = True
             self.generator = self._get_generator()
 
         new_size = (
@@ -147,7 +146,6 @@ class TrackView(View):
                     self._prepare_board()
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     self._paused = not self._paused
-        print(self.scale, self.board.get_size())
         # TODO change to previous view
         return None
 
