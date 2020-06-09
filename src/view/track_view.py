@@ -25,7 +25,7 @@ class TrackView(View):
     neuroevolution: Neuroevolution
 
     _paused = False
-    input_neurons = 9
+    input_neurons = 7
     scale = 1.0
     coord_start: Vec2
     board: Surface

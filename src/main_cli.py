@@ -8,7 +8,7 @@ from model.neural_network.neural_network_store import NeuralNetworkStore
 from model.neuroevolution.neuroevolution import Neuroevolution
 from view.silent_environment import SilentEnvironment
 
-input_neurons = 9
+input_neurons = 7
 
 layers_infos: List[LayerInfo] = [
     LayerInfo(input_neurons, "tanh"),

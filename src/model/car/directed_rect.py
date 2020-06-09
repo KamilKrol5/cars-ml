@@ -40,7 +40,7 @@ class DirectedRectangle:
         forward = Ray(self.center, self.direction)
         backward = Ray(self.center, -self.direction)
         shape_points = list(self.shape)
-        corner_rays = [Ray(self.center, corner) for corner in shape_points[:4]]
+        corner_rays = [Ray(self.center, corner) for corner in shape_points[:2]]
 
         # front_side = LineSegment.from_points(shape_points[:2])
         # front_rays = [
