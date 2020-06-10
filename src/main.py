@@ -11,7 +11,6 @@ from model.neural_network.neural_network_store import NeuralNetworkStore
 from model.track.track import Track
 from view.action import Action, ActionType
 from view.menu import Menu
-from view.play_track_view import PlayTrackView
 from view.track_view import TrackView
 from view.window import Window
 
@@ -71,7 +70,6 @@ def main() -> None:
     menu_options = {
         "Track": Action(ActionType.CHANGE_VIEW, 1),
         "Testing segment": Action(ActionType.CHANGE_VIEW, 2),
-        "Play": Action(ActionType.CHANGE_VIEW, 3),
         "Exit": Action(ActionType.SYS_EXIT),
     }
     menu = Menu(menu_options)
@@ -81,14 +79,9 @@ def main() -> None:
     tv1 = TrackView(Track.from_points(tracks[1]["points"]))
     tv2 = TrackView(Track.from_points(tracks[3]["points"]))
 
-    nns = NeuralNetworkStore.load("data")
-    print(f"len nns: {len(nns)}")
-    tv3 = PlayTrackView(Track.from_points(tracks[1]["points"]), nns)
-
     window.add_view(menu, 0, True)
     window.add_view(tv1, 1)
     window.add_view(tv2, 2)
-    window.add_view(tv3, 3)
 
     window.run()
 
