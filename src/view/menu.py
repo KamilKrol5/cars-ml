@@ -12,6 +12,11 @@ from view.view import View
 
 
 class Menu(View):
+    FONT_COLOR = colors.ORANGE
+    SELECTED_FONT_COLOR = colors.WHITE
+    BUTTON_COLOR = colors.WHITE
+    SELECTED_BUTTON_COLOR = colors.ORANGE
+
     def __init__(self, menu_options: Dict[str, Action]):
         super().__init__()
         pygame.font.init()
@@ -47,12 +52,25 @@ class Menu(View):
             ofset_y = int(pos * 1.5 * self.button_dims[1])
             shifted_button_rect = self._button_rect.move(0, ofset_y)
             color = (
-                self.button_highlight
+                self.SELECTED_BUTTON_COLOR
                 if pos == self.selected_item
-                else self.button_color
+                else self.BUTTON_COLOR
             )
+
+            if pos == self.selected_item:
+                shifted_button_rect = shifted_button_rect.inflate(20, 20)
+            else:
+                pygame.draw.rect(destination, colors.ORANGE, shifted_button_rect, 4)
+
             pygame.draw.rect(destination, color, shifted_button_rect)
-            label = self.font.render(button, True, self.font_color)
+
+            font_color = (
+                self.SELECTED_FONT_COLOR
+                if pos == self.selected_item
+                else self.FONT_COLOR
+            )
+
+            label = self.font.render(button, True, font_color)
             destination.blit(
                 label,
                 (
