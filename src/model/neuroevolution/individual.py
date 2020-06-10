@@ -100,7 +100,8 @@ class ChildIndividual:
     @staticmethod
     def random_neuron_weights_mutation(individual: "ChildIndividual") -> None:
         """
-        Changes all weights for single randomly chosen neuron from randomly chosen layer.
+        Changes all weights for single randomly chosen neuron
+        from randomly chosen layer to random number from range [-1, 1).
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
@@ -108,8 +109,8 @@ class ChildIndividual:
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
         # TODO decide the range of new random weights
-        random_layer.weights[random_neuron_index] = np.random.random(
-            (random_layer.weights.shape[1])
+        random_layer.weights[random_neuron_index] = np.random.uniform(
+            low=-1, high=1, size=(random_layer.weights.shape[1])
         )
 
     @staticmethod
