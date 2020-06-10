@@ -59,7 +59,7 @@ class Neuroevolution:
     4. swapping entire layer.
     """
 
-    _MUTATION_RATE: Tuple[int, ...] = (7, 7, 7, 4, 4, 4, 7)
+    _MUTATION_RATE: Tuple[int, ...] = (7, 7, 7, 4, 4, 4, 7, 2)
     """
     Proportional chance for mutation by respectively (apply only to children with mutation):
     1. generate random value for single weight, <-- makes diversity
@@ -71,6 +71,7 @@ class Neuroevolution:
     6  random value for all weights of single neuron,
     ^^ makes strong diversity, useful in case of stagnancy
     7. shuffle all weights for single neuron.
+    8. Combination of 5. and 7.
     """
 
     _REPRODUCTION_PROBABILITIES = np.array(_REPRODUCTION_RATE) / sum(_REPRODUCTION_RATE)

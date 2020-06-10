@@ -124,6 +124,20 @@ class ChildIndividual:
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
         np.random.shuffle(random_layer.weights[random_neuron_index])
 
+    @staticmethod
+    def multiply_shuffle_neuron_weights_mutation(individual: "ChildIndividual") -> None:
+        """
+        Multiplies all weights for single randomly chosen neuron,
+        from randomly chosen layer, by random numbers from the range [0.5, 1.5].
+        Then shuffles these weights.
+        There is a random multiplier chosen for every single weight.
+
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
+        """
+        ChildIndividual.multiply_neuron_weights_mutation(individual)
+        ChildIndividual.neuron_weights_shuffle_mutation(individual)
+
 
 ChildIndividual.available_mutations = [
     ChildIndividual.random_weight_mutation,
@@ -133,6 +147,7 @@ ChildIndividual.available_mutations = [
     ChildIndividual.multiply_neuron_weights_mutation,
     ChildIndividual.random_neuron_weights_mutation,
     ChildIndividual.neuron_weights_shuffle_mutation,
+    ChildIndividual.multiply_shuffle_neuron_weights_mutation,
 ]
 
 
