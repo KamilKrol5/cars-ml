@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Any
 from collections import OrderedDict
 
 import pygame
@@ -13,22 +13,22 @@ from view import colors
 
 
 class OptionsMenu(View):
-    def __init__(self, tracks: Dict[str, Action]) -> None:
+    ARROW_COLOR = colors.ORANGE
+    FONT_COLOR = colors.WHITE
+    LOGO_IMAGE = pygame.image.load("resources/graphics/logo.png")
+    DIVIDER = 0.4
+
+    def __init__(self, tracks: Dict[str, Action], tracks_thumbnails: List[Any]) -> None:
         super().__init__()
         pygame.font.init()
         self.font = pygame.font.SysFont("Verdana", 30)
         self.main_font = pygame.font.SysFont("comicsansms", 60)
         self.selected_item = 0
         self._options = OrderedDict(tracks)
-        self.font_color = colors.WHITE
-        self.button_highlight = colors.GREEN
-        self.button_color = colors.LIGHTGRAY
         self._background: Optional[Tuple[Surface, Tuple[int, int]]] = None
         self.background_image: Optional[Surface] = None
-        self.divider = 0.4
         self.selected_action: Optional[Action] = None
-        self.img = pygame.image.load("resources/graphics/track1.jpg")
-        self.logo_image = pygame.image.load("resources/graphics/logo.png")
+        self.thumbnails = tracks_thumbnails
 
     def draw(self, destination: Surface, events: List[EventType], delta_time: float) -> Optional[Action]:
         size = destination.get_size()
@@ -43,15 +43,16 @@ class OptionsMenu(View):
             destination.blit(*self._logo)
 
         mini_track = self._button_rect
-        thumbnail_image = pygame.transform.scale(self.img, (mini_track.w, mini_track.h))
+        thumbnail_image = pygame.transform.scale(self.thumbnails[self.selected_item], (mini_track.w, mini_track.h))
         thumbnail = (thumbnail_image, mini_track)
         destination.blit(*thumbnail)
+        pygame.draw.rect(destination, colors.WHITE, mini_track, 4)
 
-        main_label = self.main_font.render("Select track", True, self.font_color)
+        main_label = self.main_font.render("Select track", True, self.FONT_COLOR)
         destination.blit(main_label, (size[0] // 2 - 185, size[1] // 10))
 
         track_label = self.font.render(
-            list(self._options.keys())[self.selected_item], True, self.font_color
+            list(self._options.keys())[self.selected_item], True, self.FONT_COLOR
         )
         destination.blit(
             track_label,
@@ -61,42 +62,36 @@ class OptionsMenu(View):
             ),
         )
 
-        info_label = self.font.render("PRESS ENTER TO START", True, self.font_color)
-        destination.blit(info_label, (size[0] - 380, size[1] - 40))
-
         left_arrow_points = (
-            (self.ofset_x - size[0] // 20, self.ofset_y + mini_track.h // 2),
-            (self.ofset_x - 10, self.ofset_y + mini_track.h // 2 - size[0] // 40),
-            (self.ofset_x - 10, self.ofset_y + mini_track.h // 2 + size[0] // 40),
+            (self.offset_x - size[0] // 20, self.offset_y + mini_track.h // 2),
+            (self.offset_x - 10, self.offset_y + mini_track.h // 2 - size[0] // 40),
+            (self.offset_x - 10, self.offset_y + mini_track.h // 2 + size[0] // 40),
         )
         right_arrow_points = (
-            (3 * self.ofset_x + size[0] // 20, self.ofset_y + mini_track.h // 2),
-            (3 * self.ofset_x + 10, self.ofset_y + mini_track.h // 2 - size[0] // 40),
-            (3 * self.ofset_x + 10, self.ofset_y + mini_track.h // 2 + size[0] // 40),
+            (3 * self.offset_x + size[0] // 20, self.offset_y + mini_track.h // 2),
+            (3 * self.offset_x + 10, self.offset_y + mini_track.h // 2 - size[0] // 40),
+            (3 * self.offset_x + 10, self.offset_y + mini_track.h // 2 + size[0] // 40),
         )
 
         if self.selected_item != 0:
-            pygame.draw.polygon(destination, self.font_color, left_arrow_points)
+            pygame.draw.polygon(destination, self.ARROW_COLOR, left_arrow_points)
         if self.selected_item != len(self._options) - 1:
-            pygame.draw.polygon(destination, self.font_color, right_arrow_points)
+            pygame.draw.polygon(destination, self.ARROW_COLOR, right_arrow_points)
         return None
 
     def _update_geometry(self, size: Tuple[int, int]) -> None:
-        self.ofset_y = int(self.divider * size[1])
-        self.ofset_x = size[0] // 4
+        self.offset_y = int(self.DIVIDER * size[1])
+        self.offset_x = size[0] // 4
 
         self.button_dims = size[0] // 2, size[1] // 2
 
         background_shape = Rect((0, 0), size)
         background_image = pygame.transform.scale(self.background_image, size)
         self._background = (background_image, background_shape)
-        self._button_rect = Rect((self.ofset_x, self.ofset_y), self.button_dims)
-
-        if not self.logo_image:
-            return
+        self._button_rect = Rect((self.offset_x, self.offset_y), self.button_dims)
 
         logo_image = pygame.transform.scale(
-            self.logo_image, (size[0] // 6, size[1] // 12)
+            self.LOGO_IMAGE, (size[1] // 3, size[1] // 12)
         )
         logo_shape = Rect((10, 10), (size[0] // 8, size[1] // 8))
         self._logo = (logo_image, logo_shape)
@@ -107,15 +102,15 @@ class OptionsMenu(View):
                 if event.key == pygame.K_LEFT and self.selected_item != 0:
                     self.selected_item = self.selected_item - 1
                 elif (
-                    event.key == pygame.K_RIGHT
-                    and self.selected_item != len(self._options) - 1
+                        event.key == pygame.K_RIGHT
+                        and self.selected_item != len(self._options) - 1
                 ):
                     self.selected_item = self.selected_item + 1
                 elif event.key == pygame.K_a and self.selected_item != 0:
                     self.selected_item = self.selected_item - 1
                 elif (
-                    event.key == pygame.K_d
-                    and self.selected_item != len(self._options) - 1
+                        event.key == pygame.K_d
+                        and self.selected_item != len(self._options) - 1
                 ):
                     self.selected_item = self.selected_item + 1
                 elif event.key == pygame.K_RETURN:

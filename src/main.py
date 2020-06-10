@@ -57,6 +57,7 @@ def main_no_ui() -> None:
     while True:
         sleep(sleep_time)
         car.tick(track, sleep_time)
+        car.go_brrrr()
 
 
 def main() -> None:
@@ -85,7 +86,12 @@ def main() -> None:
         "Track2": Action(ActionType.CHANGE_VIEW, 3),
         "Track3": Action(ActionType.CHANGE_VIEW, 4),
     }
-    options_menu = OptionsMenu(tracks=track_options)
+    track_images = [
+        pygame.image.load("resources/graphics/track1.jpg"),
+        pygame.image.load("resources/graphics/track2.jpg"),
+        pygame.image.load("resources/graphics/track3.jpg")
+    ]
+    options_menu = OptionsMenu(tracks=track_options, tracks_thumbnails=track_images)
     options_menu.background_image = pygame.image.load(
         "resources/graphics/menu-background.png"
     )
