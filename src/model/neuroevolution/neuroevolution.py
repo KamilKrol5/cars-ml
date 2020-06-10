@@ -46,15 +46,16 @@ class Neuroevolution:
     Mutation chance for every child.
     """
 
-    _REPRODUCTION_RATE: Tuple[int, ...] = (1, 1, 1)
+    _REPRODUCTION_RATE: Tuple[int, ...] = (1, 1, 1, 1)
     """
     Proportional chance for reproduction by respectively:
     1. swapping single weight,
-    2. swapping single neuron,
-    3. swapping entire layer.
+    2. swapping single bias,
+    3. swapping single neuron,
+    4. swapping entire layer.
     """
 
-    _MUTATION_RATE: Tuple[int, ...] = (7, 7, 7, 7, 7, 2, 7)
+    _MUTATION_RATE: Tuple[int, ...] = (7, 7, 7, 4, 4, 4, 7)
     """
     Proportional chance for mutation by respectively (apply only to children with mutation):
     1. generate random value for single weight,
