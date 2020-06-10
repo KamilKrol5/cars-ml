@@ -8,6 +8,8 @@ from planar.polygon import Polygon
 from planar.transform import Affine
 
 _ANGLE_CALCULATION_HELPER: float = 90 / np.square(np.pi)
+# keep in sync with `surrounding_rays`
+SURROUNDING_RAYS_COUNT = 6
 
 
 @dataclass
@@ -53,7 +55,10 @@ class DirectedRectangle:
             Ray(self.center, self.left_direction),
         ]
 
-        return [forward, backward, *sides, *corner_rays]
+        rays = [forward, backward, *sides, *corner_rays]
+        assert len(rays) == SURROUNDING_RAYS_COUNT
+
+        return rays
 
     @property
     def center(self) -> Point:

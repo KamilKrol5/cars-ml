@@ -97,6 +97,7 @@ class Track:
         for segment_id in self._spread_segment_ids(active_segment):
             if self.segments[segment_id].is_point_inside(center):
                 return segment_id
+        # TODO: signal collision
         # raise RuntimeError("none of the track's segments contain the given point")
         return active_segment
 

@@ -8,6 +8,7 @@ from pygame.event import EventType
 from pygame.rect import Rect
 from pygame.surface import Surface
 
+from model.car.directed_rect import SURROUNDING_RAYS_COUNT
 from model.track.track import Track
 from model.neural_network.neural_network import LayerInfo
 from model.neuroevolution.neuroevolution import Neuroevolution
@@ -25,7 +26,6 @@ class TrackView(View):
     neuroevolution: Neuroevolution
 
     _paused = False
-    input_neurons = 7
     scale = 1.0
     coord_start: Vec2
     board: Surface
@@ -38,7 +38,7 @@ class TrackView(View):
         super().__init__()
         self.track = track
         layers_infos: List[LayerInfo] = [
-            LayerInfo(self.input_neurons, "tanh"),
+            LayerInfo(SURROUNDING_RAYS_COUNT + 1, "tanh"),
             LayerInfo(8, "tanh"),
             LayerInfo(12, "tanh"),
             LayerInfo(8, "tanh"),

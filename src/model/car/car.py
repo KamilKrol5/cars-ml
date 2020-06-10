@@ -80,6 +80,7 @@ class Car:
     def _update_speed(self, acceleration: float, delta_time: float) -> None:
         speed_dir: float = np.sign(self.speed)
         acceleration_dir: float = np.sign(acceleration)
+        # TODO: revise minimal speed
         speed_limits = {
             1.0: (Car._MIN_FORWARD_SPEED, Car._MAX_FORWARD_SPEED),
             -1.0: (-Car._MAX_BACKWARD_SPEED, -Car._MIN_BACKWARD_SPEED),

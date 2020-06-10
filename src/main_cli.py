@@ -3,13 +3,14 @@ import time
 from itertools import count
 from typing import List
 
+from model.car.directed_rect import SURROUNDING_RAYS_COUNT
 from model.track.track import Track
 from model.neural_network.neural_network import LayerInfo
 from model.neural_network.neural_network_store import NeuralNetworkStore
 from model.neuroevolution.neuroevolution import Neuroevolution
 from view.silent_environment import SilentEnvironment
 
-input_neurons = 7
+input_neurons = SURROUNDING_RAYS_COUNT + 1
 
 layers_infos: List[LayerInfo] = [
     LayerInfo(input_neurons, "tanh"),
