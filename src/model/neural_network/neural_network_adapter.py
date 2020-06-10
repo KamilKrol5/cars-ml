@@ -28,8 +28,8 @@ class NeuralNetworkAdapter:
         """
         if self.neural_network.input_layer_neuron_count - 1 != len(distances):
             raise ValueError(
-                "Neural network incompatible with sensors, "
-                "amount of input neurons must be equals to numbers of sensors.\n"
+                "Neural network incompatible with sensors, amount of input neurons "
+                "must be equals to numbers of sensors plus one for speed.\n"
                 f"Neural network input neurons: {self.neural_network.input_layer_neuron_count}.\n"
                 f"Sensors count: {len(distances)}."
             )
