@@ -28,34 +28,65 @@ class ChildIndividual:
         return tuple(np.random.randint(neural_network_layer.weights.shape))
 
     @staticmethod
+    def get_random_weight_indexes(
+        neural_network_layer: Layer, indexes_count: int
+    ) -> Tuple[Tuple[int, ...], ...]:
+        return tuple(
+            np.random.randint(neural_network_layer.weights.shape, size=indexes_count)
+        )
+
+    @staticmethod
     def get_random_bias_index(neural_network_layer: Layer) -> int:
         return cast(int, np.random.randint(neural_network_layer.biases.shape[0]))
 
     @staticmethod
-    def random_weight_mutation(individual: "ChildIndividual") -> None:
+    def get_random_bias_indexes(
+        neural_network_layer: Layer, indexes_count: int
+    ) -> Tuple[int, ...]:
+        return cast(
+            Tuple[int, ...],
+            np.random.randint(neural_network_layer.biases.shape[0], size=indexes_count),
+        )
+
+    @staticmethod
+    def random_weight_mutation(
+        individual: "ChildIndividual", weights_to_mutate: int = 1
+    ) -> None:
         """
         Changes a randomly chosen weight in the neural network to random value from range [-1, 1)
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
+            weights_to_mutate (int): Number of random choices of weight to be mutated.
         """
         random_layer = individual.get_random_layer()
-        random_index = individual.get_random_weight_index(random_layer)
+        random_indexes = individual.get_random_weight_indexes(
+            random_layer, weights_to_mutate
+        )
         # TODO discuss new weight value's range, update method documentation
-        random_layer.weights[random_index] = np.random.uniform(-1, 1)
+        random_layer.weights.put(
+            random_indexes, np.random.uniform(-1, 1, size=weights_to_mutate)
+        )
 
     @staticmethod
-    def random_bias_mutation(individual: "ChildIndividual") -> None:
+    def random_bias_mutation(
+        individual: "ChildIndividual", biases_to_mutate: int = 1
+    ) -> None:
         """
         Changes a randomly chosen bias in the neural network to random value from range [-1, 1)
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
+            biases_to_mutate (int): Number of random choices of bias to be mutated.
         """
         random_layer = individual.get_random_layer()
-        random_index = individual.get_random_bias_index(random_layer)
+        random_indexes = individual.get_random_bias_indexes(
+            random_layer, biases_to_mutate
+        )
         # TODO discuss new bias value's range, update method documentation
-        random_layer.biases[random_index] = np.random.uniform(-1, 1)
+        random_layer.biases.put(
+            random_indexes, np.random.uniform(-1, 1, size=biases_to_mutate)
+        )
 
     @staticmethod
     def biases_shuffle_mutation(individual: "ChildIndividual") -> None:
