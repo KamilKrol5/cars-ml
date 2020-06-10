@@ -16,17 +16,17 @@ class Neuroevolution:
     Genetic algorithm.
     """
 
-    _INDIVIDUALS: int = 10
+    _INDIVIDUALS: int = 20
     """
     Amount of individuals per generation, minimum 3.
     """
 
-    _GOLDEN_TICKETS: int = 2
+    _GOLDEN_TICKETS: int = 4
     """
     Amount of individuals allowed to reproduce for sure.
     """
 
-    _MAX_PARENTS: int = _INDIVIDUALS // 2
+    _MAX_PARENTS: int = _INDIVIDUALS // 3
     """
     Maximal parents count.
     """
@@ -41,7 +41,7 @@ class Neuroevolution:
         """
         return (individual.adaptation / bound_adaptation) ** 3
 
-    _MUTATION_CHANCE: float = 0.30
+    _MUTATION_CHANCE: float = 0.70
     """
     Mutation chance for every child.
     """
@@ -92,7 +92,7 @@ class Neuroevolution:
         self.individuals = self.individuals[: self._INDIVIDUALS]
 
     def _selection(self) -> List[AdultIndividual]:
-        bound_adaptation = self.individuals[0].adaptation
+        bound_adaptation = self.individuals[self._GOLDEN_TICKETS].adaptation
         parents = self.individuals[: self._GOLDEN_TICKETS]
         for individual in self.individuals[self._GOLDEN_TICKETS :]:
             if np.random.rand() < self._reproduction_probability(
