@@ -79,5 +79,6 @@ class Environment(ABC, Generic[T_CONTEXT, T_STATE]):
         for car_state in car_group:
             yield self._car_adaptation(car_state)
 
-    def _car_adaptation(self, car_state: CarState) -> float:
+    @staticmethod
+    def _car_adaptation(car_state: CarState) -> float:
         return car_state.car.active_segment

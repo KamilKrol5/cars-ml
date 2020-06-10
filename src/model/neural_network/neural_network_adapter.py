@@ -29,7 +29,9 @@ class NeuralNetworkAdapter:
         if self.neural_network.input_layer_neuron_count - 1 != len(distances):
             raise ValueError(
                 "Neural network incompatible with sensors, "
-                "amount of input neurons must be equals to numbers of sensors."
+                "amount of input neurons must be equals to numbers of sensors.\n"
+                f"Neural network input neurons: {self.neural_network.input_layer_neuron_count}.\n"
+                f"Sensors count: {len(distances)}."
             )
         valid_input = np.expand_dims(np.array(distances + [speed]), 0)
         output = self.neural_network.predict(valid_input)
