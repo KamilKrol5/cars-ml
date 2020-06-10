@@ -173,19 +173,46 @@ class AdultIndividual:
         child_2 = ChildIndividual(deepcopy(father2.neural_network))
 
         for _ in range(weights_to_be_swapped):
-            random_layer_index = child_1.get_random_layer_index()
-            child_1_rand_layer = child_1.neural_network.hidden_layers[
-                random_layer_index
-            ]
-            child_2_rand_layer = child_2.neural_network.hidden_layers[
-                random_layer_index
-            ]
-
+            (
+                child_1_rand_layer,
+                child_2_rand_layer,
+            ) = AdultIndividual._get_random_layers_from_children(child_1, child_2)
             weight_index = ChildIndividual.get_random_weight_index(child_1_rand_layer)
             swap_numpy_same_index(
                 child_1_rand_layer.weights, child_2_rand_layer.weights, weight_index
             )
 
+        return child_1, child_2
+
+    @staticmethod
+    def bias_swap_reproduction(
+        father1: "AdultIndividual",
+        father2: "AdultIndividual",
+        biases_to_be_swapped: int = 1,
+    ) -> Tuple[ChildIndividual, ChildIndividual]:
+        """
+        Return two new individuals (children). They are created by
+        swapping one or more biases in one randomly chosen layer from parents.
+
+        Args:
+            father1 (AdultIndividual): First parent
+            father2 (AdultIndividual): Second parent
+            biases_to_be_swapped (int): Number of biases in single layer to be swapped
+
+        Returns:
+            Tuple[ChildIndividual, ChildIndividual]: Tuple consisting two new individuals.
+        """
+        child_1 = ChildIndividual(deepcopy(father1.neural_network))
+        child_2 = ChildIndividual(deepcopy(father2.neural_network))
+        for _ in range(biases_to_be_swapped):
+            (
+                child_1_rand_layer,
+                child_2_rand_layer,
+            ) = AdultIndividual._get_random_layers_from_children(child_1, child_2)
+            bias_index = ChildIndividual.get_random_bias_index(child_1_rand_layer)
+            swap_numpy_same_index(
+                child_1_rand_layer.biases, child_2_rand_layer.biases, bias_index
+            )
         return child_1, child_2
 
     @staticmethod
@@ -209,19 +236,11 @@ class AdultIndividual:
         child_2 = ChildIndividual(deepcopy(mother2.neural_network))
 
         for _ in range(neurons_to_swap):
-            random_layer_index = child_1.get_random_layer_index()
-            child_1_rand_layer_w = child_1.neural_network.hidden_layers[
-                random_layer_index
-            ].weights
-            child_2_rand_layer_w = child_2.neural_network.hidden_layers[
-                random_layer_index
-            ].weights
-
-            neuron_index = np.random.randint(0, child_2_rand_layer_w.shape[0])
-            swap_numpy_same_index(
-                child_1_rand_layer_w, child_2_rand_layer_w, neuron_index
+            ch1_layer, ch2_layer = AdultIndividual._get_random_layers_from_children(
+                child_1, child_2
             )
-
+            neuron_index = np.random.randint(0, ch2_layer.weights.shape[0])
+            swap_numpy_same_index(ch1_layer.weights, ch2_layer.weights, neuron_index)
         return child_1, child_2
 
     @staticmethod
@@ -253,9 +272,36 @@ class AdultIndividual:
 
         return child_1, child_2
 
+    @staticmethod
+    def _get_random_layers_from_children(
+        *children: ChildIndividual,
+    ) -> Tuple[Layer, ...]:
+        """
+        Choose a random layer index and returns
+        tuple containing provided children's layers at this index.
+
+        Args:
+            *children (ChildIndividual): children to get layers from
+
+        Returns:
+            Tuple[Layer, ...]: tuple consisting of provided children's layers
+        """
+        if children:
+            layers: List[Layer] = []
+            random_layer_index = children[0].get_random_layer_index()
+            for child in children:
+                child_rand_layer = child.neural_network.hidden_layers[
+                    random_layer_index
+                ]
+                layers.append(child_rand_layer)
+            return tuple(layers)
+        else:
+            return ()
+
 
 AdultIndividual.available_reproductions = [
     AdultIndividual.weight_swap_reproduction,
+    AdultIndividual.bias_swap_reproduction,
     AdultIndividual.neuron_swap_reproduction,
     AdultIndividual.layer_swap_reproduction,
 ]
