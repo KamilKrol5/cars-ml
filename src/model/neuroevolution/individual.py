@@ -58,6 +58,17 @@ class ChildIndividual:
         random_layer.biases[random_index] = np.random.uniform(-3, 3)
 
     @staticmethod
+    def biases_shuffle_mutation(individual: "ChildIndividual") -> None:
+        """
+        Shuffles all biases of randomly chosen layer.
+
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
+        """
+        random_layer = individual.get_random_layer()
+        np.random.shuffle(random_layer.biases)
+
+    @staticmethod
     def change_weight_sign_mutation(individual: "ChildIndividual") -> None:
         """
         Changes the sign of a randomly chosen weight in the neural network.
@@ -101,13 +112,27 @@ class ChildIndividual:
             -3, 3, random_layer.weights.shape[1]
         )
 
+    @staticmethod
+    def neuron_weights_shuffle_mutation(individual: "ChildIndividual") -> None:
+        """
+        Shuffles all weights for single randomly chosen neuron from randomly chosen layer.
+
+        Args:
+            individual (ChildIndividual): Individual (neural network) to be modified.
+        """
+        random_layer = individual.get_random_layer()
+        random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
+        np.random.shuffle(random_layer.weights[random_neuron_index])
+
 
 ChildIndividual.available_mutations = [
     ChildIndividual.random_weight_mutation,
     ChildIndividual.random_bias_mutation,
+    ChildIndividual.biases_shuffle_mutation,
     ChildIndividual.change_weight_sign_mutation,
     ChildIndividual.multiply_neuron_weights_mutation,
     ChildIndividual.random_neuron_weights_mutation,
+    ChildIndividual.neuron_weights_shuffle_mutation,
 ]
 
 

@@ -63,11 +63,13 @@ class Neuroevolution:
     Proportional chance for mutation by respectively (apply only to children with mutation):
     1. generate random value for single weight, <-- makes diversity
     2. generate random value for single bias, <-- makes diversity
-    3. change the sign of single weight, <-- very poor, useless
-    4. multiply all weights of single neuron by numbers in range 0.1 to 10,
+    3. shuffle biases in one layer
+    4. change the sign of single weight, <-- very poor, useless
+    5. multiply all weights of single neuron by numbers in range 0.1 to 10,
     ^^ maintains individuals value, enhance good individuals
-    5  random value for all weights of single neuron.
+    6  random value for all weights of single neuron,
     ^^ makes strong diversity, useful in case of stagnancy
+    7. shuffle all weights for single neuron.
     """
 
     _REPRODUCTION_PROBABILITIES = np.array(_REPRODUCTION_RATE) / sum(_REPRODUCTION_RATE)
