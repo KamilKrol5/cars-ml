@@ -9,7 +9,7 @@ from planar.transform import Affine
 
 _ANGLE_CALCULATION_HELPER: float = 90 / np.square(np.pi)
 # keep in sync with `surrounding_rays`
-SURROUNDING_RAYS_COUNT = 6
+SURROUNDING_RAYS_COUNT = 5
 
 
 @dataclass
@@ -40,7 +40,7 @@ class DirectedRectangle:
         and two more in front.
         """
         forward = Ray(self.center, self.direction)
-        backward = Ray(self.center, -self.direction)
+        # backward = Ray(self.center, -self.direction)
         shape_points = list(self.shape)
         corner_rays = [Ray(self.center, corner) for corner in shape_points[:2]]
 
@@ -55,7 +55,7 @@ class DirectedRectangle:
             Ray(self.center, self.left_direction),
         ]
 
-        rays = [forward, backward, *sides, *corner_rays]
+        rays = [forward, *sides, *corner_rays]
         assert len(rays) == SURROUNDING_RAYS_COUNT
 
         return rays

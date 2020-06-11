@@ -1,4 +1,3 @@
-import sys
 from typing import Tuple, List, Generator, TypeVar, Any
 
 import numpy as np
@@ -16,17 +15,22 @@ class Neuroevolution:
     Genetic algorithm.
     """
 
-    _INDIVIDUALS: int = 20
+    _iteration_counter = 1
     """
-    Amount of individuals per generation, minimum 3.
+    Iteration number.
     """
 
-    _GOLDEN_TICKETS: int = 4
+    _INDIVIDUALS: int = 70
+    """
+    Amount of individuals per generation.
+    """
+
+    _GOLDEN_TICKETS: int = 1
     """
     Amount of individuals allowed to reproduce for sure.
     """
 
-    _MAX_PARENTS: int = _INDIVIDUALS // 3
+    _MAX_PARENTS: int = 1
     """
     Maximal parents count.
     """
@@ -41,7 +45,7 @@ class Neuroevolution:
         """
         return (individual.adaptation / bound_adaptation) ** 3
 
-    _MUTATION_CHANCE: float = 0.70
+    _MUTATION_CHANCE: float = 1.0
     """
     Mutation chance for every child.
     """
@@ -54,14 +58,16 @@ class Neuroevolution:
     3. swapping entire layer.
     """
 
-    _MUTATION_RATE: Tuple[int, int, int, int, int] = (7, 7, 7, 7, 2)
+    _MUTATION_RATE: Tuple[int, int, int, int, int] = (10, 3, 0, 5, 1)
     """
     Proportional chance for mutation by respectively (apply only to children with mutation):
-    1. generate random value for single weight,
-    2. generate random value for single bias,
-    3. change the sign of single weight,
-    4. multiply all weights of single neuron by numbers in range 0.5 to 1.5,
+    1. generate random value for single weight, <-- makes diversity
+    2. generate random value for single bias, <-- makes diversity
+    3. change the sign of single weight, <-- very poor, useless
+    4. multiply all weights of single neuron by numbers in range 0.1 to 10,
+    ^^ maintains individuals value, enhance good individuals
     5  random value for all weights of single neuron.
+    ^^ makes strong diversity, useful in case of stagnancy
     """
 
     _REPRODUCTION_PROBABILITIES = np.array(_REPRODUCTION_RATE) / sum(_REPRODUCTION_RATE)
@@ -92,33 +98,29 @@ class Neuroevolution:
         self.individuals = self.individuals[: self._INDIVIDUALS]
 
     def _selection(self) -> List[AdultIndividual]:
-        bound_adaptation = self.individuals[self._GOLDEN_TICKETS].adaptation
+        bound_adaptation = self.individuals[0].adaptation
         parents = self.individuals[: self._GOLDEN_TICKETS]
+
         for individual in self.individuals[self._GOLDEN_TICKETS :]:
             if np.random.rand() < self._reproduction_probability(
                 individual, bound_adaptation
             ):
                 parents.append(individual)
-                if len(parents) == self._MAX_PARENTS:
+                if len(parents) >= self._MAX_PARENTS:
                     break
-
-        print(
-            f"Individuals to reproduce: {len(parents)} out of {self._INDIVIDUALS}",
-            file=sys.stderr,
-        )
         return parents
 
     def _reproduction(self, parents: List[AdultIndividual]) -> List[ChildIndividual]:
         children_to_make = self._INDIVIDUALS - len(parents)
         children: List[ChildIndividual] = []
+
         while len(children) < children_to_make:
             mother, father = np.random.choice(parents, size=2)
-            while mother == father:
-                father = np.random.choice(parents)
             daughter, son = np.random.choice(
                 AdultIndividual.available_reproductions,
                 p=self._REPRODUCTION_PROBABILITIES,
             )(mother, father)
+
             children.append(daughter)
             if len(children) < children_to_make:
                 children.append(son)
@@ -144,6 +146,9 @@ class Neuroevolution:
             with_parents (bool): Indicates whether parents of current generation
                 should take part in race.
         """
+        print(f"Iteration: {self._iteration_counter}")
+        self._iteration_counter += 1
+
         network_groups = {
             "children": [child.neural_network for child in self._new_generation]
         }
@@ -151,8 +156,6 @@ class Neuroevolution:
             network_groups["parents"] = [
                 parent.neural_network for parent in self._parents
             ]
-
-        print(f"New generation size: {len(self._new_generation)}")
         adaptations = yield from environment.generate_adaptations(network_groups)
 
         new_individuals = [
@@ -161,7 +164,9 @@ class Neuroevolution:
         ]
         self.individuals.extend(new_individuals)
         self._sort_individuals_and_kill_unnecessary()
+
         self._parents = self._selection()
+        print(f"Best adaptation: {self._parents[0].adaptation}")
         children: List[ChildIndividual] = self._reproduction(self._parents)
         self._new_generation = self._mutation(children)
 
