@@ -39,9 +39,11 @@ class TrackView(View):
         self.track = track
         layers_infos: List[LayerInfo] = [
             LayerInfo(SURROUNDING_RAYS_COUNT + 1, "tanh"),
-            LayerInfo(8, "tanh"),
-            LayerInfo(12, "tanh"),
-            LayerInfo(8, "tanh"),
+            # LayerInfo(8, "tanh"),
+            LayerInfo(5, "tanh"),
+            LayerInfo(3, "tanh"),
+            # LayerInfo(4, "tanh"),
+            # LayerInfo(8, "tanh"),
         ]
         self.environment = PyGameEnvironment(track)
         self.neuroevolution = Neuroevolution.init_with_neural_network_info(
