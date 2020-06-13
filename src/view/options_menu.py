@@ -30,7 +30,9 @@ class OptionsMenu(View):
         self.selected_action: Optional[Action] = None
         self.thumbnails = tracks_thumbnails
 
-    def draw(self, destination: Surface, events: List[EventType], delta_time: float) -> Optional[Action]:
+    def draw(
+        self, destination: Surface, events: List[EventType], delta_time: float
+    ) -> Optional[Action]:
         size = destination.get_size()
         self._update_geometry(size)
 
@@ -43,7 +45,9 @@ class OptionsMenu(View):
             destination.blit(*self._logo)
 
         mini_track = self._button_rect
-        thumbnail_image = pygame.transform.scale(self.thumbnails[self.selected_item], (mini_track.w, mini_track.h))
+        thumbnail_image = pygame.transform.scale(
+            self.thumbnails[self.selected_item], (mini_track.w, mini_track.h)
+        )
         thumbnail = (thumbnail_image, mini_track)
         destination.blit(*thumbnail)
         pygame.draw.rect(destination, colors.WHITE, mini_track, 4)
@@ -102,15 +106,15 @@ class OptionsMenu(View):
                 if event.key == pygame.K_LEFT and self.selected_item != 0:
                     self.selected_item = self.selected_item - 1
                 elif (
-                        event.key == pygame.K_RIGHT
-                        and self.selected_item != len(self._options) - 1
+                    event.key == pygame.K_RIGHT
+                    and self.selected_item != len(self._options) - 1
                 ):
                     self.selected_item = self.selected_item + 1
                 elif event.key == pygame.K_a and self.selected_item != 0:
                     self.selected_item = self.selected_item - 1
                 elif (
-                        event.key == pygame.K_d
-                        and self.selected_item != len(self._options) - 1
+                    event.key == pygame.K_d
+                    and self.selected_item != len(self._options) - 1
                 ):
                     self.selected_item = self.selected_item + 1
                 elif event.key == pygame.K_RETURN:
