@@ -17,11 +17,10 @@ class OptionsMenu(View):
     FONT_COLOR = colors.WHITE
     LOGO_IMAGE = pygame.image.load("resources/graphics/logo.png")
     DIVIDER = 0.4
+    FONT = pygame.font.SysFont("Verdana", 30)
 
     def __init__(self, tracks: Dict[str, Action], tracks_thumbnails: List[Any]) -> None:
         super().__init__()
-        pygame.font.init()
-        self.font = pygame.font.SysFont("Verdana", 30)
         self.main_font = pygame.font.SysFont("comicsansms", 60)
         self.selected_item = 0
         self._options = OrderedDict(tracks)
@@ -52,11 +51,11 @@ class OptionsMenu(View):
         destination.blit(*thumbnail)
         pygame.draw.rect(destination, colors.WHITE, mini_track, 4)
 
-        main_label = self.main_font.render("Select track", True, self.FONT_COLOR)
+        main_label = self.main_font.render("Select track", True, OptionsMenu.FONT_COLOR)
         destination.blit(main_label, (size[0] // 2 - 185, size[1] // 10))
 
-        track_label = self.font.render(
-            list(self._options.keys())[self.selected_item], True, self.FONT_COLOR
+        track_label = OptionsMenu.FONT.render(
+            list(self._options.keys())[self.selected_item], True, OptionsMenu.FONT_COLOR
         )
         destination.blit(
             track_label,
@@ -78,13 +77,15 @@ class OptionsMenu(View):
         )
 
         if self.selected_item != 0:
-            pygame.draw.polygon(destination, self.ARROW_COLOR, left_arrow_points)
+            pygame.draw.polygon(destination, OptionsMenu.ARROW_COLOR, left_arrow_points)
         if self.selected_item != len(self._options) - 1:
-            pygame.draw.polygon(destination, self.ARROW_COLOR, right_arrow_points)
+            pygame.draw.polygon(
+                destination, OptionsMenu.ARROW_COLOR, right_arrow_points
+            )
         return None
 
     def _update_geometry(self, size: Tuple[int, int]) -> None:
-        self.offset_y = int(self.DIVIDER * size[1])
+        self.offset_y = int(OptionsMenu.DIVIDER * size[1])
         self.offset_x = size[0] // 4
 
         self.button_dims = size[0] // 2, size[1] // 2
@@ -95,7 +96,7 @@ class OptionsMenu(View):
         self._button_rect = Rect((self.offset_x, self.offset_y), self.button_dims)
 
         logo_image = pygame.transform.scale(
-            self.LOGO_IMAGE, (size[1] // 3, size[1] // 12)
+            OptionsMenu.LOGO_IMAGE, (size[1] // 3, size[1] // 12)
         )
         logo_shape = Rect((10, 10), (size[0] // 8, size[1] // 8))
         self._logo = (logo_image, logo_shape)
