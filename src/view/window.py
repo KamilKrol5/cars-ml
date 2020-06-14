@@ -18,7 +18,6 @@ class Window:
         resizable: bool = False,
         min_size: Optional[Tuple[int, int]] = None,
     ):
-        pygame.init()
         pygame.display.set_caption(name)
         self._mode = pygame.HWSURFACE | pygame.DOUBLEBUF
         if fullscreen:
