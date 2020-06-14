@@ -18,10 +18,10 @@ class OptionsMenu(View):
     LOGO_IMAGE = pygame.image.load("resources/graphics/logo.png")
     DIVIDER = 0.4
     FONT = pygame.font.SysFont("Verdana", 30)
+    MAIN_FONT = pygame.font.SysFont("comicsansms", 60)
 
     def __init__(self, tracks: Dict[str, Action], tracks_thumbnails: List[Any]) -> None:
         super().__init__()
-        self.main_font = pygame.font.SysFont("comicsansms", 60)
         self.selected_item = 0
         self._options = OrderedDict(tracks)
         self._background: Optional[Tuple[Surface, Tuple[int, int]]] = None
@@ -51,7 +51,9 @@ class OptionsMenu(View):
         destination.blit(*thumbnail)
         pygame.draw.rect(destination, colors.WHITE, mini_track, 4)
 
-        main_label = self.main_font.render("Select track", True, OptionsMenu.FONT_COLOR)
+        main_label = OptionsMenu.MAIN_FONT.render(
+            "Select track", True, OptionsMenu.FONT_COLOR
+        )
         destination.blit(main_label, (size[0] // 2 - 185, size[1] // 10))
 
         track_label = OptionsMenu.FONT.render(
