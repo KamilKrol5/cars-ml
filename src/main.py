@@ -78,17 +78,23 @@ def main() -> None:
 
     tv1 = TrackView(Track.from_points(tracks[6]["points"]))
     tv2 = TrackView(Track.from_points(tracks[3]["points"]))
-    tv3 = TrackView(Track.from_points(tracks[4]["points"]))
+    tv3 = TrackView(Track.from_points(tracks[5]["points"]))
+    tv4 = TrackView(Track.from_points(tracks[2]["points"]))
+    tv5 = TrackView(Track.from_points(tracks[1]["points"]))
 
     track_options = {
         "Track1": Action(ActionType.CHANGE_VIEW, 2),
         "Track2": Action(ActionType.CHANGE_VIEW, 3),
         "Track3": Action(ActionType.CHANGE_VIEW, 4),
+        "Track4": Action(ActionType.CHANGE_VIEW, 5),
+        "Track5": Action(ActionType.CHANGE_VIEW, 6),
     }
     track_images = [
         pygame.image.load("resources/graphics/track1.jpg"),
         pygame.image.load("resources/graphics/track2.jpg"),
         pygame.image.load("resources/graphics/track3.jpg"),
+        pygame.image.load("resources/graphics/track4.jpg"),
+        pygame.image.load("resources/graphics/track5.jpg"),
     ]
     options_menu = OptionsMenu(tracks=track_options, tracks_thumbnails=track_images)
     options_menu.background_image = pygame.image.load(
@@ -99,6 +105,8 @@ def main() -> None:
     window.add_view(tv1, 2)
     window.add_view(tv2, 3)
     window.add_view(tv3, 4)
+    window.add_view(tv4, 5)
+    window.add_view(tv5, 6)
     window.add_view(options_menu, 1)
 
     window.run()
