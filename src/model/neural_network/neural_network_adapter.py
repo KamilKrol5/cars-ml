@@ -33,6 +33,6 @@ class NeuralNetworkAdapter:
                 f"Neural network input neurons: {self.neural_network.input_layer_neuron_count}.\n"
                 f"Sensors count: {len(distances)}."
             )
-        valid_input = np.expand_dims(np.array(distances + [speed]), 0)
+        valid_input = np.expand_dims(np.array(distances + [speed]) / 100, 0)
         output = self.neural_network.predict(valid_input)
         return CarInstruction(*output[0])

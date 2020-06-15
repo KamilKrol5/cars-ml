@@ -16,13 +16,14 @@ class Collision(Exception):
 
 
 class Car:
-    _TRACTION: float = 7.5
+    _TRACTION: float = 100
     _ACCELERATION_RATE: float = 10.0
-    _BRAKING_RATE: float = 5.0
+    _BRAKING_RATE: float = 20.0
     _MAX_FORWARD_SPEED: float = 200.0
-    _MIN_FORWARD_SPEED: float = 30.0
+    _MIN_FORWARD_SPEED: float = 10.0
     _MAX_BACKWARD_SPEED: float = 50.0
-    _MIN_BACKWARD_SPEED: float = 5.0
+    _MIN_BACKWARD_SPEED: float = 10.0
+    _FIRE_WALL_SPEED: float = 1 / 25  # needs 25 ticks per segment
 
     __slots__ = (
         "rect",
@@ -31,6 +32,7 @@ class Car:
         "speed",
         "active_segment",
         "ticks",
+        "fire_wall",
     )
 
     def __init__(
@@ -45,6 +47,7 @@ class Car:
         self.neural_network_adapter = NeuralNetworkAdapter(neural_network)
         self.speed = 0.0
         self.active_segment: SegmentId = 0
+        self.fire_wall = -5.0  # wire wall is set 5 segments before start
 
     @classmethod
     def with_standard_sensors(
@@ -61,6 +64,8 @@ class Car:
         return track.sense_closest(self.sensors, self.active_segment)
 
     def _check_collision(self, track: Track) -> bool:
+        if self.fire_wall >= self.active_segment:
+            return True
         return track.intersects(self.rect.shape, self.active_segment)
 
     def transform(self, trans: Affine) -> None:
@@ -105,6 +110,7 @@ class Car:
             self._update_speed(acceleration, remaining_time)
 
     def tick(self, track: Track, delta_time: float) -> None:
+        self.fire_wall += Car._FIRE_WALL_SPEED
         distances = self._sense_surroundings(track)
         instructions = self.neural_network_adapter.get_instructions(
             distances, self.speed

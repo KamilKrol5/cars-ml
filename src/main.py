@@ -76,7 +76,7 @@ def main() -> None:
     menu.background_image = pygame.image.load("resources/graphics/menu-background.png")
     menu.logo_image = pygame.image.load("resources/graphics/logo.png")
 
-    tv1 = TrackView(Track.from_points(tracks[1]["points"]))
+    tv1 = TrackView(Track.from_points(tracks[6]["points"]))
     tv2 = TrackView(Track.from_points(tracks[3]["points"]))
 
     window.add_view(menu, 0, True)

@@ -38,8 +38,9 @@ class PyGameEnvironment(Environment[EnvironmentContext, EnvironmentState]):
     def _finalize_iteration(
         self, state: EnvironmentState, context: EnvironmentContext
     ) -> EnvironmentState:
-        # TODO display data more interesting for user in the corners
-        txt_surface = self.font.render(f"Cars: {state.cars_count}", False, colors.WHITE)
+        # TODO display in the corners more interesting data for user
+        # txt_surface = self.font.render(f"Cars: {state.cars_count}", False, colors.WHITE)
+        txt_surface = self.font.render("", False, colors.WHITE)
         context.surface.blit(txt_surface, dest=(0, 0))
         return EnvironmentState(0)
 
