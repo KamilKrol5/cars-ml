@@ -12,6 +12,11 @@ class NeuralNetworkAdapter:
     Convert data formats between Car and NeuralNetwork.
     """
 
+    _PREPROCESSING_RATE = 1 / 100
+    """
+    Every input number will be multiplied by this before enter to neural network.
+    """
+
     def __init__(self, neural_network: NeuralNetwork):
         if neural_network.output_neurons_count != 2:
             raise ValueError("Neural network need 2 output neurons to be compatible.")
@@ -33,6 +38,8 @@ class NeuralNetworkAdapter:
                 f"Neural network input neurons: {self.neural_network.input_layer_neuron_count}.\n"
                 f"Sensors count: {len(distances)}."
             )
-        valid_input = np.expand_dims(np.array(distances + [speed]) / 100, 0)
+        valid_input = np.expand_dims(
+            np.array(distances + [speed]) * self._PREPROCESSING_RATE, 0
+        )
         output = self.neural_network.predict(valid_input)
         return CarInstruction(*output[0])
