@@ -95,8 +95,8 @@ class ChildIndividual:
         random_layer = individual.get_random_layer()
         random_neuron_index = np.random.randint(0, random_layer.weights.shape[0])
         # TODO decide the range of new random weights
-        random_layer.weights[random_neuron_index] = (
-            np.random.random((random_layer.weights.shape[1])) * 6 - 3
+        random_layer.weights[random_neuron_index] = np.random.uniform(
+            -3, 3, random_layer.weights.shape[1]
         )
 
 
