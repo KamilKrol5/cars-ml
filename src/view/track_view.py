@@ -144,7 +144,7 @@ class TrackView(View):
                 elif event.key == pygame.K_KP_MINUS:
                     self.scale *= 0.625
                     self._prepare_board()
-                elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                elif event.key == pygame.K_SPACE:
                     self._paused = not self._paused
         # TODO change to previous view
         return None
