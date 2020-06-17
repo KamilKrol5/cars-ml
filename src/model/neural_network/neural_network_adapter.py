@@ -24,12 +24,14 @@ class NeuralNetworkAdapter:
 
     def get_instructions(self, distances: List[float], speed: float) -> CarInstruction:
         """
-        Get instructions for car based on neural network output.
+        Translate sensor output into car instructions.
+
         Args:
             distances (List[float]): Distances counted by sensors.
             speed (float): Current car's speed.
-        Return:
-            Instructions that define car's behavior.
+
+        Returns:
+            Instructions that define the car's behavior.
         """
         if self.neural_network.input_layer_neuron_count - 1 != len(distances):
             raise ValueError(
@@ -43,4 +45,5 @@ class NeuralNetworkAdapter:
             np.array(distances + [speed]) * NeuralNetworkAdapter._PREPROCESSING_RATE, 0
         )
         output = self.neural_network.predict(valid_input)
+
         return CarInstruction(*output[0])
