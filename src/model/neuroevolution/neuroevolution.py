@@ -100,6 +100,7 @@ class Neuroevolution:
     def _selection(self) -> List[AdultIndividual]:
         bound_adaptation = self.individuals[0].adaptation
         parents = self.individuals[: self._GOLDEN_TICKETS]
+
         for individual in self.individuals[self._GOLDEN_TICKETS :]:
             if np.random.rand() < self._reproduction_probability(
                 individual, bound_adaptation
@@ -112,12 +113,14 @@ class Neuroevolution:
     def _reproduction(self, parents: List[AdultIndividual]) -> List[ChildIndividual]:
         children_to_make = self._INDIVIDUALS - len(parents)
         children: List[ChildIndividual] = []
+
         while len(children) < children_to_make:
             mother, father = np.random.choice(parents, size=2)
             daughter, son = np.random.choice(
                 AdultIndividual.available_reproductions,
                 p=self._REPRODUCTION_PROBABILITIES,
             )(mother, father)
+
             children.append(daughter)
             if len(children) < children_to_make:
                 children.append(son)
@@ -145,6 +148,7 @@ class Neuroevolution:
         """
         print(f"Iteration: {self._iteration_counter}")
         self._iteration_counter += 1
+
         network_groups = {
             "children": [child.neural_network for child in self._new_generation]
         }
@@ -153,12 +157,14 @@ class Neuroevolution:
                 parent.neural_network for parent in self._parents
             ]
         adaptations = yield from environment.generate_adaptations(network_groups)
+
         new_individuals = [
             AdultIndividual(child.neural_network, adaptation)
             for child, adaptation in zip(self._new_generation, adaptations["children"])
         ]
         self.individuals.extend(new_individuals)
         self._sort_individuals_and_kill_unnecessary()
+
         self._parents = self._selection()
         print(f"Best adaptation: {self._parents[0].adaptation}")
         children: List[ChildIndividual] = self._reproduction(self._parents)

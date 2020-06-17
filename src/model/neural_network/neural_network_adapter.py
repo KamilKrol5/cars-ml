@@ -38,6 +38,7 @@ class NeuralNetworkAdapter:
                 f"Neural network input neurons: {self.neural_network.input_layer_neuron_count}.\n"
                 f"Sensors count: {len(distances)}."
             )
+
         valid_input = np.expand_dims(
             np.array(distances + [speed]) * NeuralNetworkAdapter._PREPROCESSING_RATE, 0
         )
