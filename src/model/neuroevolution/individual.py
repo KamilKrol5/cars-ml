@@ -5,7 +5,7 @@ from typing import Tuple, ClassVar, List, Callable, cast
 import numpy as np
 
 from model.neural_network.neural_network import NeuralNetwork, Layer
-from utils import swap_same_index, swap_numpy_same_index
+from utils import swap_same_index, swap_numpy_same_index, numpy_random_index
 
 
 @dataclass
@@ -29,11 +29,15 @@ class ChildIndividual:
 
     @staticmethod
     def get_random_weight_indexes(
-        neural_network_layer: Layer, indexes_count: int
-    ) -> Tuple[Tuple[int, ...], ...]:
-        return tuple(
-            np.random.randint(neural_network_layer.weights.shape, size=indexes_count)
-        )
+        layer: Layer, indexes_count: int
+    ) -> Tuple[np.ndarray, ...]:
+        """
+        Calculates indexes_count random weight indexes for a single layer.
+
+        Returned tuple is ready to be used immediately for indexing the layer's weights.
+        """
+        weights = layer.weights
+        return numpy_random_index(weights, count=indexes_count)
 
     @staticmethod
     def get_random_bias_index(neural_network_layer: Layer) -> int:
@@ -42,11 +46,8 @@ class ChildIndividual:
     @staticmethod
     def get_random_bias_indexes(
         neural_network_layer: Layer, indexes_count: int
-    ) -> Tuple[int, ...]:
-        return cast(
-            Tuple[int, ...],
-            np.random.randint(neural_network_layer.biases.shape[0], size=indexes_count),
-        )
+    ) -> Tuple[np.ndarray, ...]:
+        return numpy_random_index(neural_network_layer.biases, count=indexes_count)
 
     @staticmethod
     def random_weight_mutation(
@@ -64,8 +65,8 @@ class ChildIndividual:
             random_layer, weights_to_mutate
         )
         # TODO discuss new weight value's range, update method documentation
-        random_layer.weights.put(
-            random_indexes, np.random.uniform(-1, 1, size=weights_to_mutate)
+        random_layer.weights[random_indexes] = np.random.uniform(
+            -1, 1, size=weights_to_mutate
         )
 
     @staticmethod
@@ -77,21 +78,21 @@ class ChildIndividual:
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
-            biases_to_mutate (int): Number of random choices of bias to be mutated.
+            biases_to_mutate (int): Number of random choices of biases to be mutated.
         """
         random_layer = individual.get_random_layer()
         random_indexes = individual.get_random_bias_indexes(
             random_layer, biases_to_mutate
         )
         # TODO discuss new bias value's range, update method documentation
-        random_layer.biases.put(
-            random_indexes, np.random.uniform(-1, 1, size=biases_to_mutate)
+        random_layer.biases[random_indexes] = np.random.uniform(
+            -1, 1, size=biases_to_mutate
         )
 
     @staticmethod
     def biases_shuffle_mutation(individual: "ChildIndividual") -> None:
         """
-        Shuffles all biases of randomly chosen layer.
+        Shuffles all biases of a randomly chosen layer.
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
@@ -146,7 +147,7 @@ class ChildIndividual:
     @staticmethod
     def neuron_weights_shuffle_mutation(individual: "ChildIndividual") -> None:
         """
-        Shuffles all weights for single randomly chosen neuron from randomly chosen layer.
+        Shuffles all weights for a single randomly chosen neuron from a randomly chosen layer.
 
         Args:
             individual (ChildIndividual): Individual (neural network) to be modified.
@@ -158,9 +159,8 @@ class ChildIndividual:
     @staticmethod
     def multiply_shuffle_neuron_weights_mutation(individual: "ChildIndividual") -> None:
         """
-        Multiplies all weights for single randomly chosen neuron,
-        from randomly chosen layer, by random numbers from the range [0.5, 1.5].
-        Then shuffles these weights.
+        Multiplies all weights of one random neuron by random numbers and shuffles them.
+
         There is a random multiplier chosen for every single weight.
 
         Args:
@@ -237,16 +237,17 @@ class AdultIndividual:
         biases_to_be_swapped: int = 1,
     ) -> Tuple[ChildIndividual, ChildIndividual]:
         """
-        Return two new individuals (children). They are created by
-        swapping one or more biases in one randomly chosen layer from parents.
+        Performs reproduction by swapping one or more biases of parents.
+
+        Layers whose biases are to be swapped are chosen randomly.
 
         Args:
-            father1 (AdultIndividual): First parent
-            father2 (AdultIndividual): Second parent
-            biases_to_be_swapped (int): Number of biases in single layer to be swapped
+            father1 (AdultIndividual): First parent.
+            father2 (AdultIndividual): Second parent.
+            biases_to_be_swapped (int): Number of biases in a single layer to be swapped.
 
         Returns:
-            Tuple[ChildIndividual, ChildIndividual]: Tuple consisting two new individuals.
+            Tuple[ChildIndividual, ChildIndividual]: Two new individuals.
         """
         child_1 = ChildIndividual(deepcopy(father1.neural_network))
         child_2 = ChildIndividual(deepcopy(father2.neural_network))
@@ -323,14 +324,13 @@ class AdultIndividual:
         *children: ChildIndividual,
     ) -> Tuple[Layer, ...]:
         """
-        Choose a random layer index and returns
-        tuple containing provided children's layers at this index.
+        Returns a randomly chosen layer for each provided child.
 
         Args:
-            *children (ChildIndividual): children to get layers from
+            *children (ChildIndividual): children to get layers from.
 
         Returns:
-            Tuple[Layer, ...]: tuple consisting of provided children's layers
+            Tuple[Layer, ...]: tuple consisting of provided children's random layers.
         """
         if children:
             layers: List[Layer] = []

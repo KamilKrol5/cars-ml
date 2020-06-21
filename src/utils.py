@@ -59,3 +59,33 @@ def generator_value(gen: Generator[Any, None, T]) -> T:
             next(gen)
     except StopIteration as si:
         return cast(T, si.value)
+
+
+def numpy_random_index(
+    a: np.ndarray, /, count: int = None, *, rng: np.random.Generator = None,
+) -> Union[Tuple[int, ...], Tuple[np.ndarray, ...]]:
+    """
+    Generates random indexes into an array.
+
+    Args:
+        a (numpy.ndarray): An array.
+        count (int, optional): How many indexes to generate.
+            Defaults to None, which means one index.
+        rng (numpy.random.Generator, optional): The random generator to use.
+            Defaults to numpy.random.default_rng().
+
+    Returns:
+        A tuple of length `a.ndim`, containing indexes into `a`.
+
+        Each element is an array of `count` elements,
+        unless `count` is None, then they are scalars.
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+
+    if count is not None:
+        size = (count, a.ndim)
+    else:
+        size = a.ndim
+
+    return tuple(rng.integers(0, a.shape, size).T)
